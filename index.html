@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#141a2e">
+<link rel="apple-touch-icon" href="img/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>Mesevár – esti mesék</title>
 <style>
 :root{--bg:#fff7ec;--card:#fff;--tx:#3b2f2f;--sub:#8a7a7a;--pri:#ff8a5c;--green:#2e9e4f;--hl:#e6f7ea}
@@ -64,6 +68,7 @@ main{padding:0 16px 90px;max-width:760px;margin:auto}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="stories.js"></script>
+<script src="stories-uj.js"></script>
 <script>
 const S=window.STORIES,$=id=>document.getElementById(id);
 const CATS={all:"✨ Mind",esti:"🌙 Esti",nepmese:"📖 Népmese",allatos:"🐾 Állatos",kaland:"🧭 Kaland"};
@@ -131,6 +136,7 @@ $("share").onclick=()=>{const url=location.origin+location.pathname+"#"+cur.id;
  $("copy").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(url);$("copy").textContent="Másolva ✓"}};
 $("close").onclick=()=>$("modal").classList.remove("open");
 
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
 daily();chips();list();
 if(location.hash.length>1)open(location.hash.slice(1));
 </script>
