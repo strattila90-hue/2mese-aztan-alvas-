@@ -59,10 +59,15 @@ body.lock{overflow:hidden}
 #wc{will-change:transform;transform:translateZ(0)}
 button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.nav{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));max-width:620px;margin:auto;display:flex;background:var(--card);border-radius:34px;box-shadow:0 6px 24px #0004;padding:6px;z-index:5}
+.nav button{flex:1;background:none;color:var(--tx);font-size:24px;padding:6px 0;border-radius:26px;display:flex;flex-direction:column;align-items:center;min-height:56px}
+.nav button small{font-size:11px;color:var(--sub)}.nav button:active{background:var(--hl)}
+.reader{z-index:6}main{padding-bottom:120px}
+.end{text-align:center;margin:30px 0 90px}.end .chip{margin:6px;font-size:17px;padding:14px 22px}
 </style>
 </head>
 <body>
-<header><h1>🌙 Mesevár</h1><span style="display:flex;gap:10px"><button class="round" id="wheelBtn" title="Szerencsekerék">🎡</button><button class="round" id="homeShare" title="Megosztás">🔗</button><button class="round" id="nightBtn" title="Éjszakai mód">🌙</button></span></header>
+<header><h1>🌙 Mesevár</h1><small style="color:var(--sub)">Esti mesék 3–6 éveseknek</small></header>
 <main>
  <div class="hero" id="daily"></div>
  <input class="search" id="q" placeholder="🔍 Mese keresése…">
@@ -71,7 +76,7 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 </main>
 
 <section class="reader" id="reader">
- <div class="top"><button class="round" id="back">←</button><span><button class="round" id="share">🔗</button> <button class="round" id="fs">Aa</button></span></div>
+ <div class="top"><button class="chip" id="back">← Vissza</button><span><button class="round" id="share">🔗</button> <button class="round" id="fs">Aa</button> <button class="round" id="x">✕</button></span></div>
  <div class="cover" id="cover"></div>
  <article class="story" id="story"></article>
  <div class="bar"><button class="play" id="play">▶</button>
@@ -79,6 +84,7 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <input type="range" id="rate" min="0.6" max="1.2" step="0.05" value="0.85" title="Sebesség"></div>
 </section>
 
+<nav class="nav"><button data-a="home">🏠<small>Főoldal</small></button><button data-a="list">📚<small>Mesék</small></button><button data-a="wheel">🎡<small>Kerék</small></button><button data-a="night">🌙<small>Éjszaka</small></button><button data-a="share">🔗<small>Megosztás</small></button></nav>
 <div class="modal" id="modal"><div class="box"><b id="mt">Oszd meg</b><div id="qr"></div><small id="lnk" style="word-break:break-all"></small><br><br><button class="chip" id="copy">Link másolása</button> <button class="chip" id="nat" style="display:none">Küldés</button> <button class="chip" id="close">Bezár</button></div></div>
 
 <div class="modal" id="wheelModal"><div class="box" style="max-width:340px">
@@ -91,15 +97,16 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 <script src="stories.js"></script>
 <script src="stories-uj.js"></script>
 <script src="stories-3.js"></script>
+<script src="stories-hosszu.js"></script>
 <script>
 const S=window.STORIES,$=id=>document.getElementById(id);
-const CATS={all:"✨ Mind",esti:"🌙 Esti",nepmese:"📖 Népmese",allatos:"🐾 Állatos",tunderes:"🧚 Tündéres",kaland:"🧭 Kaland"};
+const CATS={all:"✨ Mind",esti:"🌙 Esti",nepmese:"📖 Népmese",allatos:"🐾 Állatos",hosszu:"⏱ Hosszú (6+ perc)",tunderes:"🧚 Tündéres",kaland:"🧭 Kaland"};
 let cat="all",cur=null,words=[],offs=[],spans=[],idx=0,speaking=false,timer=null,fs=1;
 
 // Éjszakai mód: automatikus este, kézzel is váltható
 const h=new Date().getHours();
 if(localStorage.night? localStorage.night==="1" : (h>=19||h<6)) document.body.classList.add("night");
-$("nightBtn").onclick=()=>{document.body.classList.toggle("night");try{localStorage.night=document.body.classList.contains("night")?"1":"0"}catch(e){}};
+window.toggleNight=()=>{document.body.classList.toggle("night");try{localStorage.night=document.body.classList.contains("night")?"1":"0"}catch(e){}};
 
 const grad=s=>`linear-gradient(135deg,${s.bg[0]},${s.bg[1]})`;
 function daily(){const d=Math.floor(Date.now()/864e5),s=S[d%S.length];
@@ -109,21 +116,23 @@ function daily(){const d=Math.floor(Date.now()/864e5),s=S[d%S.length];
 function chips(){$("chips").innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="chip ${k==cat?"on":""}" data-k="${k}">${v}</button>`).join("");
  document.querySelectorAll(".chip[data-k]").forEach(b=>b.onclick=()=>{cat=b.dataset.k;chips();list()})}
 function list(){const q=$("q").value.toLowerCase();
- $("grid").innerHTML=S.filter(s=>(cat=="all"||s.cat==cat)&&s.title.toLowerCase().includes(q)).map(s=>
+ $("grid").innerHTML=S.filter(s=>(cat=="all"||s.cat==cat||(cat=="hosszu"&&s.min>=6))&&s.title.toLowerCase().includes(q)).map(s=>
  `<div class="card" data-id="${s.id}"><div class="img" style="background:${grad(s)}">${s.emoji}</div><div class="t">${s.title}<small>${s.min} perc</small></div></div>`).join("");
  document.querySelectorAll(".card").forEach(c=>c.onclick=()=>open(c.dataset.id))}
 $("q").oninput=list;
 
 function open(id){stop();cur=S.find(s=>s.id===id);if(!cur)return;
- history.replaceState(null,"","#"+id);
+ if(history.state&&history.state.r)history.replaceState({r:1},"","#"+id);else history.pushState({r:1},"","#"+id);
  $("cover").style.background=grad(cur);$("cover").textContent=cur.emoji;
  words=[];let html=`<h2>${cur.title}</h2>`;
  cur.text.forEach(p=>{html+="<p>"+p.split(/\s+/).map(w=>{words.push(w);return `<span class="w">${w}</span>`}).join(" ")+"</p>"});
- $("story").innerHTML=html;spans=[...document.querySelectorAll(".w")];
+ html+=`<div class="end"><div style="font-size:48px">🌙</div><button class="chip" id="endBack">✓ Vége – vissza a menübe</button><br><button class="chip" id="endWheel">🎡 Másik mesét pörgetek</button></div>`;
+ $("story").innerHTML=html;$("endBack").onclick=()=>closeReader();$("endWheel").onclick=()=>{closeReader();setTimeout(openWheel,60)};spans=[...document.querySelectorAll(".w")];
  let o=0;offs=words.map(w=>{const s=o;o+=w.length+1;return s});
  $("reader").classList.add("open");document.body.classList.add("lock");$("reader").scrollTop=0;idx=0;lm=-1}
-function close(){stop();$("reader").classList.remove("open");document.body.classList.remove("lock");history.replaceState(null,"","#")}
-$("back").onclick=close;
+function closeReader(fromPop){stop();$("reader").classList.remove("open");document.body.classList.remove("lock");
+ if(!fromPop){if(history.state&&history.state.r)history.back();else history.replaceState(null,"",location.pathname)}}
+$("back").onclick=()=>closeReader();$("x").onclick=()=>closeReader();
 
 // Felolvasás (böngésző beépített TTS, magyar hang)
 let voices=[];
@@ -166,7 +175,7 @@ function showShare(url,title){$("mt").textContent=title;$("lnk").textContent=url
  $("nat").style.display=navigator.share?"inline-block":"none";
  $("nat").onclick=()=>navigator.share({title:"Mesevár",text:title,url}).catch(()=>{})}
 $("share").onclick=()=>showShare(location.origin+location.pathname+"#"+cur.id,"Oszd meg a mesét: "+cur.title);
-$("homeShare").onclick=()=>showShare(location.origin+location.pathname,"Oszd meg a Mesevárat");
+window.homeShare=()=>showShare(location.origin+location.pathname,"Oszd meg a Mesevárat");
 $("close").onclick=()=>$("modal").classList.remove("open");
 
 // Szerencsekerék
@@ -191,8 +200,13 @@ function spin(){if(spinning)return;spinning=true;$("wres").innerHTML="🎶";$("s
   $("go").onclick=()=>{$("wheelModal").classList.remove("open");open(s.id)};
   try{const u=new SpeechSynthesisUtterance("A mai mese: "+s.title);u.lang="hu-HU";speechSynthesis.speak(u)}catch(e){}
  })(t0)}
-$("wheelBtn").onclick=openWheel;$("spin").onclick=spin;
+$("spin").onclick=spin;
 $("wclose").onclick=()=>{try{speechSynthesis.cancel()}catch(e){}$("wheelModal").classList.remove("open")};
+window.onpopstate=()=>{if($("reader").classList.contains("open"))closeReader(true);$("modal").classList.remove("open");$("wheelModal").classList.remove("open")};
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>({
+ home:()=>{cat="all";$("q").value="";chips();list();scrollTo({top:0,behavior:"smooth"})},
+ list:()=>$("chips").scrollIntoView({behavior:"smooth",block:"start"}),
+ wheel:openWheel,night:()=>window.toggleNight(),share:()=>window.homeShare()})[b.dataset.a]());
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
 daily();chips();list();
 if(location.hash.length>1)open(location.hash.slice(1));

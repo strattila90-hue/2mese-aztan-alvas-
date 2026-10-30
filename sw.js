@@ -1,5 +1,5 @@
-const C="mesevar-v5",QR="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
-const F=["./","index.html","stories.js","stories-uj.js","stories-3.js","manifest.json","icon-192.png","icon-512.png"];
+const C="mesevar-v6",QR="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
+const F=["./","index.html","stories.js","stories-uj.js","stories-3.js","stories-hosszu.js","manifest.json","icon-192.png","icon-512.png"];
 self.addEventListener("install",e=>{e.waitUntil((async()=>{const c=await caches.open(C);await c.addAll(F);try{await c.put(QR,await fetch(QR,{mode:"no-cors"}))}catch(_){}})());self.skipWaiting()});
 self.addEventListener("activate",e=>e.waitUntil((async()=>{for(const k of await caches.keys())if(k!==C)await caches.delete(k);await self.clients.claim()})()));
 // Cache-first: azonnal tölt, háttérben frissít
