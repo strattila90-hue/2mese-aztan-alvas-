@@ -7,10 +7,12 @@
 <meta name="theme-color" content="#141a2e">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Mesevár – esti mesék</title>
+<title>2mese és alvás</title>
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-title" content="2mese és alvás">
 <style>
 :root{--bg:#fff7ec;--card:#fff;--tx:#3b2f2f;--sub:#8a7a7a;--pri:#ff8a5c;--green:#2e9e4f;--hl:#e6f7ea}
-body.night{--bg:#141a2e;--card:#1f2742;--tx:#e8e6f5;--sub:#9aa0c0;--pri:#7c8cff;--green:#6fe08f;--hl:#1d3a2c}
+body.night{--bg:#16120f;--card:#231c16;--tx:#f0dcc0;--sub:#a8927a;--pri:#e0894a;--green:#9bd17a;--hl:#2d2a1c;color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;font-family:"Nunito","Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--tx);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);transition:.3s}
 header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px}
@@ -66,10 +68,17 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .end{text-align:center;margin:30px 0 90px}.end .chip{margin:6px;font-size:17px;padding:14px 22px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom));background:#333;color:#fff;padding:12px 20px;border-radius:26px;z-index:20;font-size:15px;opacity:0;pointer-events:none;transition:.3s;max-width:90%;text-align:center}
 .toast.on{opacity:1}#upd.spin{animation:rot .8s linear infinite}@keyframes rot{to{transform:rotate(360deg)}}
+body.night .card .img,body.night .hero,body.night .cover{filter:brightness(.62) saturate(.7)}
+body.night #wc{filter:brightness(.72) saturate(.8)}
+body.night .story{line-height:1.9}
+body.night *{box-shadow:none!important}
+.install{position:fixed;left:10px;right:10px;top:calc(8px + env(safe-area-inset-top));max-width:620px;margin:auto;background:var(--card);border-radius:24px;box-shadow:0 6px 24px #0005!important;padding:12px 14px;display:none;align-items:center;gap:10px;z-index:8}
+.install.on{display:flex}.install div{flex:1;font-size:15px}.install small{display:block;color:var(--sub)}
+.install .chip{background:var(--pri);color:#fff}.install .x{background:none;color:var(--sub);font-size:20px}
 </style>
 </head>
 <body>
-<header><div><h1>🌙 Mesevár</h1><small style="color:var(--sub)">Esti mesék 3–6 éveseknek</small></div><button class="round" id="upd" title="Frissítés">🔄</button></header>
+<header><div style="display:flex;align-items:center;gap:12px"><img src="icon-192.png" alt="" width="46" height="46" style="border-radius:14px;box-shadow:0 3px 10px #0004"><div><h1>2mese és alvás</h1><small style="color:var(--sub)">Esti mesék 3–6 éveseknek</small></div></div><button class="round" id="upd" title="Frissítés">🔄</button></header>
 <main>
  <div class="hero" id="daily"></div>
  <input class="search" id="q" placeholder="🔍 Mese keresése…">
@@ -82,13 +91,15 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
  <div class="cover" id="cover"></div>
  <article class="story" id="story"></article>
  <div class="bar"><button class="play" id="play">▶</button>
-  <select id="voice" title="Hang"></select>
+  <button class="chip" id="sl" title="Alvásidőzítő">😴</button><select id="voice" title="Hang"></select>
   <input type="range" id="rate" min="0.6" max="1.2" step="0.05" value="0.85" title="Sebesség"></div>
 </section>
 
+<div class="install" id="install"><img src="icon-192.png" width="44" height="44" style="border-radius:12px" alt=""><div><b>Telepítsd: 2mese és alvás</b><small>Offline is működik, ikon a kezdőképernyőn</small></div><button class="chip" id="instBtn">Telepítés</button><button class="x" id="instX">✕</button></div>
+<div class="modal" id="iosm"><div class="box"><b>📲 Telepítés iPhone-on</b><p style="text-align:left;line-height:1.8">1. Nyisd meg <b>Safariban</b><br>2. Koppints a <b>Megosztás</b> ⬆️ gombra<br>3. Válaszd: <b>Főképernyőhöz adás</b><br>4. Koppints: <b>Hozzáadás</b></p><button class="chip" id="iosx">Rendben</button></div></div>
 <div class="toast" id="toast"></div>
 <nav class="nav"><button data-a="home">🏠<small>Főoldal</small></button><button data-a="list">📚<small>Mesék</small></button><button data-a="wheel">🎡<small>Kerék</small></button><button data-a="night">🌙<small>Éjszaka</small></button><button data-a="share">🔗<small>Megosztás</small></button></nav>
-<div class="modal" id="modal"><div class="box"><b id="mt">Oszd meg</b><div id="qr"></div><small id="lnk" style="word-break:break-all"></small><br><br><button class="chip" id="copy">Link másolása</button> <button class="chip" id="nat" style="display:none">Küldés</button> <button class="chip" id="close">Bezár</button></div></div>
+<div class="modal" id="modal"><div class="box"><b id="mt">Oszd meg</b><div id="qr"></div><small id="lnk" style="word-break:break-all"></small><br><br><button class="chip" id="copy">Link másolása</button> <button class="chip" id="instShare" style="display:none">📲 Telepítés</button> <button class="chip" id="nat" style="display:none">Küldés</button> <button class="chip" id="close">Bezár</button></div></div>
 
 <div class="modal" id="wheelModal"><div class="box" style="max-width:340px">
  <b style="font-size:20px">🎡 Szerencsekerék</b>
@@ -110,8 +121,10 @@ let cat="all",cur=null,words=[],offs=[],spans=[],idx=0,speaking=false,timer=null
 
 // Éjszakai mód: automatikus este, kézzel is váltható
 const h=new Date().getHours();
-if(localStorage.night? localStorage.night==="1" : (h>=19||h<6)) document.body.classList.add("night");
-window.toggleNight=()=>{document.body.classList.toggle("night");try{localStorage.night=document.body.classList.contains("night")?"1":"0"}catch(e){}};
+let nd=null;try{nd=JSON.parse(localStorage.nightPref||"null")}catch(e){}
+if((nd&&nd.d===new Date().toDateString())?nd.v:(h>=19||h<6))document.body.classList.add("night");
+function themeMeta(){document.querySelector('meta[name=theme-color]').content=document.body.classList.contains("night")?"#16120f":"#fff7ec"}themeMeta();
+window.toggleNight=()=>{document.body.classList.toggle("night");try{localStorage.nightPref=JSON.stringify({d:new Date().toDateString(),v:document.body.classList.contains("night")})}catch(e){}themeMeta()};
 
 const grad=s=>`linear-gradient(135deg,${s.bg[0]},${s.bg[1]})`;
 function daily(){const d=Math.floor(Date.now()/864e5),s=S[d%S.length];
@@ -132,7 +145,7 @@ function open(id){stop();cur=S.find(s=>s.id===id);if(!cur)return;
  words=[];let html=`<h2>${cur.title}</h2>`;
  cur.text.forEach(p=>{html+="<p>"+p.split(/\s+/).map(w=>{words.push(w);return `<span class="w">${w}</span>`}).join(" ")+"</p>"});
  html+=`<div class="end"><div style="font-size:48px">🌙</div><button class="chip" id="endBack">✓ Vége – vissza a menübe</button><br><button class="chip" id="endWheel">🎡 Másik mesét pörgetek</button></div>`;
- $("story").innerHTML=html;$("endBack").onclick=()=>closeReader();$("endWheel").onclick=()=>{closeReader();setTimeout(openWheel,60)};spans=[...document.querySelectorAll(".w")];
+ $("story").innerHTML=html;$("endBack").onclick=()=>closeReader();$("endWheel").onclick=()=>{closeReader();setTimeout(openWheel,400)};spans=[...document.querySelectorAll(".w")];
  let o=0;offs=words.map(w=>{const s=o;o+=w.length+1;return s});
  $("reader").classList.add("open");document.body.classList.add("lock");$("reader").scrollTop=0;idx=0;lm=-1}
 function closeReader(fromPop){stop();if(window.pendingUpdate){hardRefresh();return}$("reader").classList.remove("open");document.body.classList.remove("lock");
@@ -155,32 +168,37 @@ function mark(i){if(lm<0||i<lm)spans.forEach((s,k)=>{s.classList.toggle("r",k<i)
  const el=spans[i],R=$("reader");if(!el||Date.now()<userScroll)return;
  const r=el.getBoundingClientRect();
  if(r.bottom>innerHeight-170||r.top<110)R.scrollTo({top:el.offsetTop-R.clientHeight*0.35,behavior:"smooth"})}
+let gen=0,sleepAt=0,sli=0;const SL=[0,15,30,45];
 function speak(){if(!("speechSynthesis" in window))return alert("Ez a böngésző nem tud felolvasni.");
- speechSynthesis.cancel();speaking=true;$("play").textContent="⏸";
- const text=words.slice(idx).join(" "),base=offs[idx]||0;
- const u=new SpeechSynthesisUtterance(text);u.lang="hu-HU";u.rate=+$("rate").value;u.pitch=1.05;
+ speechSynthesis.cancel();speaking=true;gen++;$("play").textContent="⏸";run(idx,gen)}
+function run(start,g){if(!speaking||g!==gen)return;
+ if(sleepAt&&Date.now()>=sleepAt){stop();sleepAt=0;sli=0;$("sl").textContent="😴";toast("Jó éjszakát 🌙");return}
+ if(start>=words.length){mark(words.length);stop(true);return}
+ const end=Math.min(words.length,start+28),seg=words.slice(start,end),so=[];let o=0;seg.forEach(w=>{so.push(o);o+=w.length+1});
+ const u=new SpeechSynthesisUtterance(seg.join(" "));u.lang="hu-HU";u.rate=+$("rate").value;u.pitch=1.05;
+ if(sleepAt)u.volume=Math.max(.2,Math.min(1,(sleepAt-Date.now())/12e4));
  if(voices[$("voice").value])u.voice=voices[$("voice").value];
- let gotB=false;
- u.onboundary=e=>{gotB=true;const c=e.charIndex+base;let i=offs.findIndex((o,k)=>o+words[k].length>=c&&o<=c);if(i<0)i=idx;idx=i;mark(i)};
- u.onend=()=>{if(speaking){mark(words.length);stop(true)}};
- speechSynthesis.speak(u);
- // tartalék: ha a hang nem küld szóhatárt, időzítővel haladunk
- clearInterval(timer);let t0=Date.now();
- timer=setInterval(()=>{if(gotB||!speaking)return;if(Date.now()-t0>1200){idx=Math.min(idx+1,words.length-1);mark(idx)}},Math.round(430/u.rate));
-}
-function stop(done){speaking=false;clearInterval(timer);if("speechSynthesis" in window)speechSynthesis.cancel();$("play").textContent="▶";if(done===true)idx=0}
+ let gotB=false,k=0;const t0=Date.now();
+ u.onboundary=e=>{gotB=true;let i=so.findIndex((s,j)=>s<=e.charIndex&&e.charIndex<=s+seg[j].length);if(i<0)i=k;k=i;idx=start+i;mark(idx)};
+ u.onend=()=>{if(g===gen)run(end,g)};
+ u.onerror=e=>{if(g!==gen||e.error==="interrupted"||e.error==="canceled")return;stop();toast("A felolvasás nem sikerült – nézd meg a hangbeállításokat")};
+ clearInterval(timer);
+ timer=setInterval(()=>{if(gotB||g!==gen)return;if(Date.now()-t0>1200){k=Math.min(k+1,seg.length-1);idx=start+k;mark(idx)}},Math.round(430/u.rate));
+ speechSynthesis.speak(u)}
+$("sl").onclick=()=>{sli=(sli+1)%SL.length;if(SL[sli]){sleepAt=Date.now()+SL[sli]*6e4;$("sl").textContent="😴 "+SL[sli];toast("Elalvás-időzítő: "+SL[sli]+" perc, a hang fokozatosan halkul")}else{sleepAt=0;$("sl").textContent="😴"}};
+function stop(done){gen++;speaking=false;clearInterval(timer);if("speechSynthesis" in window)speechSynthesis.cancel();$("play").textContent="▶";if(done===true)idx=0}
 $("play").onclick=()=>speaking?stop():speak();
 $("rate").onchange=()=>{if(speaking)speak()};$("voice").onchange=()=>{if(speaking)speak()};
 $("fs").onclick=()=>{fs=fs>=1.4?0.9:fs+0.2;document.documentElement.style.setProperty("--fs",fs)};
 
 // Megosztás: link + QR
 function showShare(url,title){$("mt").textContent=title;$("lnk").textContent=url;$("qr").innerHTML="";if(window.QRCode)new QRCode($("qr"),{text:url,width:180,height:180});else $("qr").textContent="A QR-kód csak online készíthető";
- $("copy").textContent="Link másolása";$("modal").classList.add("open");
+ $("copy").textContent="Link másolása";$("instShare").style.display=standalone?"none":"inline-block";$("modal").classList.add("open");
  $("copy").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(url);$("copy").textContent="Másolva ✓"};
  $("nat").style.display=navigator.share?"inline-block":"none";
- $("nat").onclick=()=>navigator.share({title:"Mesevár",text:title,url}).catch(()=>{})}
+ $("nat").onclick=()=>navigator.share({title:"2mese és alvás",text:title,url}).catch(()=>{})}
 $("share").onclick=()=>showShare(location.origin+location.pathname+"#"+cur.id,"Oszd meg a mesét: "+cur.title);
-window.homeShare=()=>showShare(location.origin+location.pathname,"Oszd meg a Mesevárat");
+window.homeShare=()=>showShare(location.origin+location.pathname,"Oszd meg a 2mese és alvás appot");
 $("close").onclick=()=>$("modal").classList.remove("open");
 
 // Szerencsekerék
@@ -225,6 +243,19 @@ async function checkUpdate(manual){
  }catch(e){if(manual)toast("Nincs internet – az offline változat fut")}
  $("upd").classList.remove("spin")}
 $("upd").onclick=()=>checkUpdate(true);
+// Telepítés (Android: natív kérés, iOS: útmutató)
+let dip=null;const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone;
+const ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+function snoozed(){try{return Date.now()-(+localStorage.instNo||0)<6048e5}catch(e){return false}}
+function maybeInstall(force){if(standalone||(!force&&snoozed()))return;$("install").classList.add("on")}
+function hideInstall(s){$("install").classList.remove("on");if(s)try{localStorage.instNo=Date.now()}catch(e){}}
+async function doInstall(){if(dip){dip.prompt();try{await dip.userChoice}catch(e){}dip=null;hideInstall();return}
+ if(ios)$("iosm").classList.add("open");else toast("Chrome menü (⋮) → Alkalmazás telepítése")}
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();dip=e;maybeInstall(location.hash.length>1)});
+window.addEventListener("appinstalled",()=>hideInstall());
+if(ios)setTimeout(()=>maybeInstall(location.hash.length>1),2500);
+$("instBtn").onclick=doInstall;$("instX").onclick=()=>hideInstall(true);$("iosx").onclick=()=>$("iosm").classList.remove("open");
+$("instShare").onclick=()=>{$("modal").classList.remove("open");doInstall()};
 if('serviceWorker' in navigator){
  const had=!!navigator.serviceWorker.controller;let rl=false;
  navigator.serviceWorker.register('sw.js');

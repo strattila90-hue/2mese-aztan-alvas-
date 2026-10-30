@@ -1,4 +1,4 @@
-# Mesevár 🌙
+# 2mese és alvás 🌙
 
 Esti mese app 3–6 éveseknek. Sima HTML, nincs build: GitHubra feltöltöd, Vercelben importálod, kész.
 
