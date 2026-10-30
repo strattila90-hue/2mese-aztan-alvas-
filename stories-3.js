@@ -7,7 +7,7 @@ window.STORIES.push(
  "Kuki megkönnyebbült, és megígérte, hogy cserébe éjjel vigyáz a kastélyra. Attól kezdve minden este halk koboldéneket dúdolt, a hercegnő pedig elaludt rá. A jó szó és az osztozás mindig barátot hoz."]},
 {id:"kis-tunder",title:"A kis tündér és a holdfény",cat:"tunderes",emoji:"🧚",bg:["#c2e9fb","#a1c4fd"],min:3,
  text:["Egy virág szirmai között élt egy kis tündér, Csillámka. Minden este ő gyújtotta fel a holdfényt a kert fölött egy apró varázspálcával.",
- "Egyszer azonban elfelejtette a pálcáját a harmatcseppnél, és a kert sötét maradt. A bogarak megijedtek, a madarak kereste az utat.",
+ "Egyszer azonban elfelejtette a pálcáját a harmatcseppnél, és a kert sötét maradt. A bogarak megijedtek, a madarak pedig keresték az utat.",
  "Csillámka sírva fakadt, de a szentjánosbogarak odarepültek hozzá. – Mi is tudunk világítani! – mondták, és sorban felgyulladtak a fűben.",
  "Megtalálta a pálcát, és újra felragyogott a Hold. Azóta Csillámka tudja, hogy a hibából is lehet tanulni, és hogy a barátok mindig segítenek. Aztán behunyta a szemét, és elaludt a virágban."]},
 {id:"sarkany-lovag",title:"A sárkány és a kis lovag",cat:"kaland",emoji:"🛡️",bg:["#f093fb","#f5576c"],min:3,
