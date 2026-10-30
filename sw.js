@@ -1,4 +1,9 @@
-const C="mesevar-v4",F=["./","index.html","stories.js","stories-uj.js","stories-3.js","manifest.json","icon-192.png","icon-512.png"];
-self.addEventListener("install",e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(F)));self.skipWaiting()});
-self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x))))));
-self.addEventListener("fetch",e=>e.respondWith(fetch(e.request).then(r=>{const c=r.clone();caches.open(C).then(x=>x.put(e.request,c));return r}).catch(()=>caches.match(e.request))));
+const C="mesevar-v5",QR="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
+const F=["./","index.html","stories.js","stories-uj.js","stories-3.js","manifest.json","icon-192.png","icon-512.png"];
+self.addEventListener("install",e=>{e.waitUntil((async()=>{const c=await caches.open(C);await c.addAll(F);try{await c.put(QR,await fetch(QR,{mode:"no-cors"}))}catch(_){}})());self.skipWaiting()});
+self.addEventListener("activate",e=>e.waitUntil((async()=>{for(const k of await caches.keys())if(k!==C)await caches.delete(k);await self.clients.claim()})()));
+// Cache-first: azonnal tölt, háttérben frissít
+self.addEventListener("fetch",e=>{const q=e.request;if(q.method!=="GET")return;
+ e.respondWith(caches.match(q,{ignoreSearch:true}).then(m=>{
+  const n=fetch(q).then(r=>{if(r&&(r.ok||r.type==="opaque")){const cl=r.clone();caches.open(C).then(x=>x.put(q,cl))}return r}).catch(()=>m||caches.match("index.html"));
+  return m||n}))});

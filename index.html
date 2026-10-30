@@ -54,6 +54,11 @@ body.lock{overflow:hidden}
 #wres{min-height:92px;margin:6px 0 10px;font-weight:700}
 #wres .e{font-size:48px;animation:pop .5s}
 @keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+.card{contain:layout paint;content-visibility:auto;contain-intrinsic-size:150px 190px;-webkit-tap-highlight-color:transparent}
+.reader,.chips{will-change:scroll-position}
+#wc{will-change:transform;transform:translateZ(0)}
+button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
@@ -82,7 +87,7 @@ body.lock{overflow:hidden}
  <div id="wres"></div>
  <button class="play" id="spin" style="width:auto;padding:0 28px;border-radius:30px">Pörgess!</button>
  <button class="chip" id="wclose" style="margin-left:6px">Bezár</button></div></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="stories.js"></script>
 <script src="stories-uj.js"></script>
 <script src="stories-3.js"></script>
@@ -116,7 +121,7 @@ function open(id){stop();cur=S.find(s=>s.id===id);if(!cur)return;
  cur.text.forEach(p=>{html+="<p>"+p.split(/\s+/).map(w=>{words.push(w);return `<span class="w">${w}</span>`}).join(" ")+"</p>"});
  $("story").innerHTML=html;spans=[...document.querySelectorAll(".w")];
  let o=0;offs=words.map(w=>{const s=o;o+=w.length+1;return s});
- $("reader").classList.add("open");document.body.classList.add("lock");$("reader").scrollTop=0;idx=0}
+ $("reader").classList.add("open");document.body.classList.add("lock");$("reader").scrollTop=0;idx=0;lm=-1}
 function close(){stop();$("reader").classList.remove("open");document.body.classList.remove("lock");history.replaceState(null,"","#")}
 $("back").onclick=close;
 
@@ -129,7 +134,10 @@ const score=v=>(/natural|online|neural|google/i.test(v.name)?2:0)+(v.localServic
 if("speechSynthesis" in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}
 let userScroll=0;
 ["touchstart","wheel","pointerdown"].forEach(ev=>$("reader").addEventListener(ev,()=>userScroll=Date.now()+4000,{passive:true}));
-function mark(i){spans.forEach((s,k)=>{s.classList.toggle("r",k<i);s.classList.toggle("now",k===i)});
+let lm=-1;
+function mark(i){if(lm<0||i<lm)spans.forEach((s,k)=>{s.classList.toggle("r",k<i);s.classList.toggle("now",k===i)});
+ else for(let k=lm;k<=i&&k<spans.length;k++){spans[k].classList.toggle("r",k<i);spans[k].classList.toggle("now",k===i)}
+ lm=i;
  const el=spans[i],R=$("reader");if(!el||Date.now()<userScroll)return;
  const r=el.getBoundingClientRect();
  if(r.bottom>innerHeight-170||r.top<110)R.scrollTo({top:el.offsetTop-R.clientHeight*0.35,behavior:"smooth"})}
@@ -152,7 +160,7 @@ $("rate").onchange=()=>{if(speaking)speak()};$("voice").onchange=()=>{if(speakin
 $("fs").onclick=()=>{fs=fs>=1.4?0.9:fs+0.2;document.documentElement.style.setProperty("--fs",fs)};
 
 // Megosztás: link + QR
-function showShare(url,title){$("mt").textContent=title;$("lnk").textContent=url;$("qr").innerHTML="";new QRCode($("qr"),{text:url,width:180,height:180});
+function showShare(url,title){$("mt").textContent=title;$("lnk").textContent=url;$("qr").innerHTML="";if(window.QRCode)new QRCode($("qr"),{text:url,width:180,height:180});else $("qr").textContent="A QR-kód csak online készíthető";
  $("copy").textContent="Link másolása";$("modal").classList.add("open");
  $("copy").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(url);$("copy").textContent="Másolva ✓"};
  $("nat").style.display=navigator.share?"inline-block":"none";
@@ -167,14 +175,14 @@ const COL=["#ff8a5c","#ffd166","#6fcf97","#56ccf2","#bb86fc","#ff7eb6","#f2c94c"
 function snd(f,d=.08,type="sine",v=.2){try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain(),n=actx.currentTime;o.type=type;o.frequency.value=f;o.connect(g);g.connect(actx.destination);g.gain.setValueAtTime(v,n);g.gain.exponentialRampToValueAtTime(.001,n+d);o.start(n);o.stop(n+d)}catch(e){}}
 function wIdx(){const a=2*Math.PI/wSegs.length;return Math.floor((((-Math.PI/2-wAng)%(2*Math.PI))+2*Math.PI)%(2*Math.PI)/a)}
 function drawWheel(){const c=$("wc"),x=c.getContext("2d"),n=wSegs.length,a=2*Math.PI/n,r=c.width/2;
- x.clearRect(0,0,c.width,c.height);x.save();x.translate(r,r);x.rotate(wAng);
+ x.clearRect(0,0,c.width,c.height);x.save();x.translate(r,r);
  wSegs.forEach((s,i)=>{x.beginPath();x.moveTo(0,0);x.arc(0,0,r-8,i*a,(i+1)*a);x.fillStyle=COL[i%COL.length];x.fill();x.strokeStyle="#fff";x.lineWidth=6;x.stroke();
   x.save();x.rotate(i*a+a/2);x.font="84px sans-serif";x.textAlign="center";x.textBaseline="middle";x.fillText(s.emoji,r*0.62,0);x.restore()});
  x.beginPath();x.arc(0,0,34,0,7);x.fillStyle="#fff";x.fill();x.restore()}
-function openWheel(){const pool=[...S].sort(()=>Math.random()-.5);wSegs=pool.slice(0,8);wAng=Math.random()*6;$("wres").innerHTML="Pörgesd meg, és kiderül, melyik mesét hallgatjuk meg!";drawWheel();$("wheelModal").classList.add("open")}
+function openWheel(){const pool=[...S].sort(()=>Math.random()-.5);wSegs=pool.slice(0,8);wAng=Math.random()*6;$("wc").style.transform=`rotate(${wAng}rad)`;$("wres").innerHTML="Pörgesd meg, és kiderül, melyik mesét hallgatjuk meg!";drawWheel();$("wheelModal").classList.add("open")}
 function spin(){if(spinning)return;spinning=true;$("wres").innerHTML="🎶";$("spin").disabled=true;
  const start=wAng,total=(5+Math.random()*3)*2*Math.PI,dur=4800,t0=performance.now();lastIdx=wIdx();
- (function f(now){const p=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-p,3);wAng=start+total*e;drawWheel();
+ (function f(now){const p=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-p,3);wAng=start+total*e;$("wc").style.transform=`rotate(${wAng}rad)`;
   const i=wIdx();if(i!==lastIdx){lastIdx=i;snd(500+Math.random()*120,.05,"triangle",.25)}
   if(p<1)return requestAnimationFrame(f);
   spinning=false;$("spin").disabled=false;$("spin").textContent="Még egyszer!";
