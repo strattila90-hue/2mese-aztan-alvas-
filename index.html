@@ -64,10 +64,12 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .nav button small{font-size:11px;color:var(--sub)}.nav button:active{background:var(--hl)}
 .reader{z-index:6}main{padding-bottom:120px}
 .end{text-align:center;margin:30px 0 90px}.end .chip{margin:6px;font-size:17px;padding:14px 22px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom));background:#333;color:#fff;padding:12px 20px;border-radius:26px;z-index:20;font-size:15px;opacity:0;pointer-events:none;transition:.3s;max-width:90%;text-align:center}
+.toast.on{opacity:1}#upd.spin{animation:rot .8s linear infinite}@keyframes rot{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
-<header><h1>🌙 Mesevár</h1><small style="color:var(--sub)">Esti mesék 3–6 éveseknek</small></header>
+<header><div><h1>🌙 Mesevár</h1><small style="color:var(--sub)">Esti mesék 3–6 éveseknek</small></div><button class="round" id="upd" title="Frissítés">🔄</button></header>
 <main>
  <div class="hero" id="daily"></div>
  <input class="search" id="q" placeholder="🔍 Mese keresése…">
@@ -84,6 +86,7 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <input type="range" id="rate" min="0.6" max="1.2" step="0.05" value="0.85" title="Sebesség"></div>
 </section>
 
+<div class="toast" id="toast"></div>
 <nav class="nav"><button data-a="home">🏠<small>Főoldal</small></button><button data-a="list">📚<small>Mesék</small></button><button data-a="wheel">🎡<small>Kerék</small></button><button data-a="night">🌙<small>Éjszaka</small></button><button data-a="share">🔗<small>Megosztás</small></button></nav>
 <div class="modal" id="modal"><div class="box"><b id="mt">Oszd meg</b><div id="qr"></div><small id="lnk" style="word-break:break-all"></small><br><br><button class="chip" id="copy">Link másolása</button> <button class="chip" id="nat" style="display:none">Küldés</button> <button class="chip" id="close">Bezár</button></div></div>
 
@@ -131,7 +134,7 @@ function open(id){stop();cur=S.find(s=>s.id===id);if(!cur)return;
  $("story").innerHTML=html;$("endBack").onclick=()=>closeReader();$("endWheel").onclick=()=>{closeReader();setTimeout(openWheel,60)};spans=[...document.querySelectorAll(".w")];
  let o=0;offs=words.map(w=>{const s=o;o+=w.length+1;return s});
  $("reader").classList.add("open");document.body.classList.add("lock");$("reader").scrollTop=0;idx=0;lm=-1}
-function closeReader(fromPop){stop();$("reader").classList.remove("open");document.body.classList.remove("lock");
+function closeReader(fromPop){stop();if(window.pendingUpdate){hardRefresh();return}$("reader").classList.remove("open");document.body.classList.remove("lock");
  if(!fromPop){if(history.state&&history.state.r)history.back();else history.replaceState(null,"",location.pathname)}}
 $("back").onclick=()=>closeReader();$("x").onclick=()=>closeReader();
 
@@ -208,7 +211,26 @@ document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>({
  home:()=>{cat="all";$("q").value="";chips();list();scrollTo({top:0,behavior:"smooth"})},
  list:()=>$("chips").scrollIntoView({behavior:"smooth",block:"start"}),
  wheel:openWheel,night:()=>window.toggleNight(),share:()=>window.homeShare()})[b.dataset.a]());
-if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+// Frissítés: kézi gomb + automatikus ellenőrzés
+function toast(m){const e=$("toast");e.textContent=m;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),3200)}
+async function hardRefresh(){try{for(const k of await caches.keys())await caches.delete(k);const r=await navigator.serviceWorker.getRegistration();r&&await r.update()}catch(e){}location.reload()}
+async function checkUpdate(manual){
+ if(manual)$("upd").classList.add("spin");
+ try{const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw 0;const j=await r.json(),v=String(j.v),old=localStorage.getItem("mv");
+  localStorage.setItem("mv",v);
+  if(manual||(old!==null&&old!==v)){
+   if(!manual&&$("reader").classList.contains("open")){window.pendingUpdate=true;toast("Új mesék érkeztek – a mese végén frissítek ✨");return}
+   toast("Frissítés…");setTimeout(hardRefresh,500);return}
+ }catch(e){if(manual)toast("Nincs internet – az offline változat fut")}
+ $("upd").classList.remove("spin")}
+$("upd").onclick=()=>checkUpdate(true);
+if('serviceWorker' in navigator){
+ const had=!!navigator.serviceWorker.controller;let rl=false;
+ navigator.serviceWorker.register('sw.js');
+ navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!had||rl)return;rl=true;if($("reader").classList.contains("open")){window.pendingUpdate=true;toast("Új verzió kész – a mese végén frissítek ✨")}else location.reload()})}
+checkUpdate(false);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate(false)});
+setInterval(()=>{if(!document.hidden)checkUpdate(false)},30*60*1000);
 daily();chips();list();
 if(location.hash.length>1)open(location.hash.slice(1));
 </script>
