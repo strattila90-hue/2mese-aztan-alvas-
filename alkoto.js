@@ -22,11 +22,43 @@ const CH=[
 {id:"roka",e:"🦊",n:"a kis róka",d:"a kis rókának",b:"róka"},
 {id:"tyuk",e:"🐔",n:"a kis tyúk",d:"a kis tyúknak",b:"tyúk"},
 {id:"mano",e:"🍄",n:"a manó",d:"a manónak",b:"manó"},
-{id:"boszi",e:"🧙",n:"a jó boszorkány",d:"a jó boszorkánynak",b:"boszorkány"}];
+{id:"boszi",e:"🧙",n:"a jó boszorkány",d:"a jó boszorkánynak",b:"boszorkány"},
+{id:"oroszlan",e:"🦁",n:"a kis oroszlán",d:"a kis oroszlánnak",b:"oroszlán"},
+{id:"elefant",e:"🐘",n:"a kis elefánt",d:"a kis elefántnak",b:"elefánt"},
+{id:"zsiraf",e:"🦒",n:"a zsiráf",d:"a zsiráfnak",b:"zsiráf"},
+{id:"majom",e:"🐒",n:"a kis majom",d:"a kis majomnak",b:"majom"},
+{id:"panda",e:"🐼",n:"a panda",d:"a pandának",b:"panda"},
+{id:"pingvin",e:"🐧",n:"a pingvin",d:"a pingvinnek",b:"pingvin"},
+{id:"kacsa",e:"🦆",n:"a kiskacsa",d:"a kiskacsának",b:"kiskacsa"},
+{id:"barany",e:"🐑",n:"a kisbárány",d:"a kisbáránynak",b:"bárány"},
+{id:"csiko",e:"🐴",n:"a kiscsikó",d:"a kiscsikónak",b:"csikó"},
+{id:"kutya",e:"🐶",n:"a kiskutya",d:"a kiskutyának",b:"kutya"},
+{id:"cica",e:"🐱",n:"a kiscica",d:"a kiscicának",b:"cica"},
+{id:"eger",e:"🐭",n:"a kisegér",d:"a kisegérnek",b:"egér"},
+{id:"beka",e:"🐸",n:"a kis béka",d:"a kis békának",b:"béka"},
+{id:"pillango",e:"🦋",n:"a pillangó",d:"a pillangónak",b:"pillangó"},
+{id:"mokus",e:"🐿️",n:"a mókus",d:"a mókusnak",b:"mókus"},
+{id:"szarvas",e:"🦌",n:"a kis szarvas",d:"a kis szarvasnak",b:"szarvas"},
+{id:"vidra",e:"🦦",n:"a vidra",d:"a vidrának",b:"vidra"},
+{id:"mehecske",e:"🐝",n:"a méhecske",d:"a méhecskének",b:"méhecske"},
+{id:"sello",e:"🧜",n:"a kis sellő",d:"a kis sellőnek",b:"sellő"},
+{id:"egyszarvu",e:"🦄",n:"az egyszarvú",d:"az egyszarvúnak",b:"egyszarvú"},
+{id:"kiraly",e:"👑",n:"a jó király",d:"a jó királynak",b:"király"},
+{id:"robot",e:"🤖",n:"a kis robot",d:"a kis robotnak",b:"robot"},
+{id:"dino",e:"🦕",n:"a kis dínó",d:"a kis dínónak",b:"dínó"},
+{id:"hoember",e:"⛄",n:"a hóember",d:"a hóembernek",b:"hóember"},
+{id:"urhajos",e:"👩‍🚀",n:"az űrhajós",d:"az űrhajósnak",b:"űrhajós"}];
 const SE=[
 {id:"erdo",e:"🌲",t:"Erdő",in:"az erdőben"},{id:"kastely",e:"🏰",t:"Kastély",in:"a kastélyban"},
 {id:"ret",e:"🌼",t:"Rét",in:"a réten"},{id:"tenger",e:"🏖️",t:"Tengerpart",in:"a tengerparton"},
-{id:"hegy",e:"⛰️",t:"Hegy",in:"a hegyen"},{id:"barlang",e:"🕯️",t:"Barlang",in:"a barlangban"}];
+{id:"hegy",e:"⛰️",t:"Hegy",in:"a hegyen"},{id:"barlang",e:"🕯️",t:"Barlang",in:"a barlangban"},
+{id:"tengermely",e:"🌊",t:"Tenger mélye",in:"a tenger mélyén",nr:1},{id:"sziget",e:"🏝️",t:"Kis sziget",in:"a kis szigeten"},
+{id:"tunderkert",e:"🌸",t:"Tündérkert",in:"a tündérkertben"},{id:"felho",e:"☁️",t:"Felhők fölött",in:"a felhők fölött",nr:1},
+{id:"cirkusz",e:"🎪",t:"Cirkusz",in:"a cirkuszban"},{id:"falu",e:"🏡",t:"Kis falu",in:"a kis faluban"},
+{id:"tanya",e:"🌾",t:"Tanya",in:"a tanyán"},{id:"vilagur",e:"🚀",t:"Csillagok között",in:"a csillagok között",nr:1},
+{id:"havas",e:"❄️",t:"Havas táj",in:"a havas tájon"},{id:"cukor",e:"🍭",t:"Cukorország",in:"Cukorországban"},
+{id:"szivarvany",e:"🌈",t:"Szivárványország",in:"Szivárványországban"},{id:"jatszoter",e:"🎠",t:"Játszótér",in:"a játszótéren"},
+{id:"kunyho",e:"🛖",t:"Kis kunyhó",in:"a kis kunyhóban"},{id:"to",e:"🌙",t:"Holdfényes tó",in:"a holdfényes tó partján"}];
 // Cselekményelemek: H = főhős, F = barát, G = harmadik szereplő (csak ha van)
 const BT=[
 {id:"reggel",e:"🌅",t:"Reggeli indulás",x:c=>`Szép reggel volt, a nap már fent járt. ${c.H} és ${c.F} elhatározták, hogy felfedezik a környéket.`},
@@ -34,7 +66,7 @@ const BT=[
 {id:"hang",e:"🔔",t:"Titokzatos hang",x:c=>`Egyszer csak halk csilingelést hallottak. – Ki van ott? – kérdezte ${c.H}. Senki sem válaszolt, csak a szél susogott. Aztán kiderült, hogy egy kis harang volt, amit a szél ringatott, és mindketten nevettek.`},
 {id:"segitseg",e:"🤝",t:"Segítség",x:c=>`${c.F} megbotlott, és megütötte a lábát. ${c.H} odasietett hozzá, és segített neki felkelni. – Köszönöm – mosolygott ${c.F}. – Jó, hogy itt vagy.`},
 {id:"jatek",e:"🎲",t:"Játék",x:c=>`Játszani kezdtek ${c.S}: bújócskáztak. ${c.H} háromig számolt, ${c.F} pedig a legjobb rejtekhelyre bújt. Aztán cseréltek, és olyan jót kacagtak, hogy még a madarak is felfigyeltek rájuk.`},
-{id:"kincs",e:"💎",t:"Csillogó kincs",x:c=>`${c.F} egyszer csak talált valami fényeset a földön. – Nézd, ${c.Hb}, egy csillogó kavics! – kiáltotta. Közösen elhatározták, hogy vigyáznak rá, és megmutatják mindenkinek.`},
+{id:"kincs",e:"💎",t:"Csillogó kincs",x:c=>`${c.F} egyszer csak talált valami fényeset maga előtt. – Nézd, ${c.Hb}, egy csillogó kavics! – kiáltotta. Közösen elhatározták, hogy vigyáznak rá, és megmutatják mindenkinek.`},
 {id:"lakoma",e:"🍯",t:"Közös lakoma",x:c=>`Megéheztek, ezért piknikezni kezdtek. Volt mézes kenyér, hűvös víz és egy kosár eper. ${c.F} mindenből adott ${c.Hd}, pedig ő is nagyon éhes volt.`},
 {id:"varazs",e:"✨",t:"Varázslat",x:c=>`Egyszer csak apró fények kezdtek táncolni körülöttük. Valaki varázsolt, hogy mindenki szépet álmodjon, és a világ egy kicsit csillogóbb lett.`},
 {id:"eso",e:"🌧️",t:"Nyári eső",x:c=>`Esni kezdett az eső, de ${c.H} és ${c.F} nem ijedtek meg. Meghúzódtak egy száraz zugban, és együtt hallgatták, ahogy az eső dobol. Egyikük sem szólt, mégis nagyon jó volt.`},
@@ -56,7 +88,7 @@ const ctx=()=>{const [a,b,g]=st.ch.map(chr);return{H:a.n,Hb:a.b,Hd:a.d,F:b.n,G:g
 const intro=()=>{const c=ctx();return `Hol volt, hol nem volt, ${c.S} élt ${c.H} és ${c.F}, akik a legjobb barátok voltak.`};
 const outro=()=>{const c=ctx();return `Végül elfáradtak, és hazaindultak. A nap lassan lement, a csillagok pedig egyenként kigyulladtak. ${cap(c.H)} és ${c.F} egymás mellett feküdtek le, és mély, nyugodt álomba merültek. Csend lett, és a világ mélyen, békésen lélegzett. Jó éjszakát!`};
 const autoTitle=()=>{const c=ctx();return cap(`${c.H} és ${c.F} meséje`)};
-function dealCards(){const pool=BT.filter(b=>!st.beats.includes(b.id)&&(!b.need||st.ch.length>=b.need));deal=shuf(pool).slice(0,4)}
+function dealCards(){const nr=(SE.find(s=>s.id===st.se)||{}).nr;const pool=BT.filter(b=>!st.beats.includes(b.id)&&(!b.need||st.ch.length>=b.need)&&!(nr&&b.id==="eso"));deal=shuf(pool).slice(0,4)}
 function say(t){if(!snd)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="hu-HU";u.rate=+Q("rate").value||.85;const v=voices[+Q("voice").value];if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}
 
 // --- felület
