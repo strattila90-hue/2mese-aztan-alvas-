@@ -115,7 +115,7 @@ function act(a,v){const f=id=>mine().find(x=>x.id===id);
  case"pc":{const i=st.ch.indexOf(v);if(i>=0)st.ch.splice(i,1);else if(st.ch.length<3)st.ch.push(v);render();break}
  case"cnext":if(st.ch.length>=2)go("set");break;
  case"ps":st.se=v;st.beats=[];st.paras=[intro()];dealCards();go("plot");say(st.paras[0]);break;
- case"pb":{const b=BT.find(x=>x.id===v);const p=cap(b.x(ctx()));st.beats.push(v);st.paras.push(p);dealCards();render();say(p);break}
+ case"pb":{const b=BT.find(x=>x.id===v);const p=cap(b.x(ctx()).replace(/([.!?]) ([a-zöüóőúéáűí])/g,(m,x,y)=>x+" "+y.toUpperCase()));st.beats.push(v);st.paras.push(p);dealCards();render();say(p);break}
  case"shuf":dealCards();render();break;
  case"undo":st.beats.pop();st.paras.pop();dealCards();render();break;
  case"snd":snd=!snd;if(!snd)try{speechSynthesis.cancel()}catch(e){}render();break;

@@ -62,7 +62,7 @@ body.lock{overflow:hidden}
 button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 .nav{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));max-width:620px;margin:auto;display:flex;background:var(--card);border-radius:34px;box-shadow:0 6px 24px #0004;padding:6px;z-index:5}
-.nav button{flex:1;background:none;color:var(--tx);font-size:24px;padding:6px 0;border-radius:26px;display:flex;flex-direction:column;align-items:center;min-height:56px}
+.nav button{flex:1;background:none;color:var(--tx);font-size:22px;padding:6px 0;border-radius:26px;display:flex;flex-direction:column;align-items:center;min-height:56px}
 .nav button small{font-size:11px;color:var(--sub)}.nav button:active{background:var(--hl)}
 .reader{z-index:6}main{padding-bottom:120px}
 .end{text-align:center;margin:30px 0 90px}.end .chip{margin:6px;font-size:17px;padding:14px 22px}
@@ -98,7 +98,7 @@ body.night *{box-shadow:none!important}
 <div class="install" id="install"><img src="icon-192.png" width="44" height="44" style="border-radius:12px" alt=""><div><b>Telepítsd: 2mese és alvás</b><small>Offline is működik, ikon a kezdőképernyőn</small></div><button class="chip" id="instBtn">Telepítés</button><button class="x" id="instX">✕</button></div>
 <div class="modal" id="iosm"><div class="box"><b>📲 Telepítés iPhone-on</b><p style="text-align:left;line-height:1.8">1. Nyisd meg <b>Safariban</b><br>2. Koppints a <b>Megosztás</b> ⬆️ gombra<br>3. Válaszd: <b>Főképernyőhöz adás</b><br>4. Koppints: <b>Hozzáadás</b></p><button class="chip" id="iosx">Rendben</button></div></div>
 <div class="toast" id="toast"></div>
-<nav class="nav"><button data-a="home">🏠<small>Főoldal</small></button><button data-a="list">📚<small>Mesék</small></button><button data-a="wheel">🎡<small>Kerék</small></button><button data-a="night">🌙<small>Éjszaka</small></button><button data-a="share">🔗<small>Megosztás</small></button></nav>
+<nav class="nav"><button data-a="home">🏠<small>Főoldal</small></button><button data-a="list">📚<small>Mesék</small></button><button data-a="mk">🧩<small>Alkotó</small></button><button data-a="wheel">🎡<small>Kerék</small></button><button data-a="night">🌙<small>Éjszaka</small></button><button data-a="share">🔗<small>Megosztás</small></button></nav>
 <div class="modal" id="modal"><div class="box"><b id="mt">Oszd meg</b><div id="qr"></div><small id="lnk" style="word-break:break-all"></small><br><br><button class="chip" id="copy">Link másolása</button> <button class="chip" id="instShare" style="display:none">📲 Telepítés</button> <button class="chip" id="nat" style="display:none">Küldés</button> <button class="chip" id="close">Bezár</button></div></div>
 
 <div class="modal" id="wheelModal"><div class="box" style="max-width:340px">
@@ -114,9 +114,10 @@ body.night *{box-shadow:none!important}
 <script src="stories-hosszu.js"></script>
 <script src="stories-grimm.js"></script>
 <script src="stories-stilus.js"></script>
+<script src="alkoto.js"></script>
 <script>
 const S=window.STORIES,$=id=>document.getElementById(id);
-const CATS={all:"✨ Mind",esti:"🌙 Esti",nepmese:"📖 Népmese",allatos:"🐾 Állatos",hosszu:"⏱ Hosszú (6+ perc)",tunderes:"🧚 Tündéres",kaland:"🧭 Kaland"};
+const CATS={all:"✨ Mind",esti:"🌙 Esti",nepmese:"📖 Népmese",allatos:"🐾 Állatos",own:"⭐ Saját",hosszu:"⏱ Hosszú (6+ perc)",tunderes:"🧚 Tündéres",kaland:"🧭 Kaland"};
 let cat="all",cur=null,words=[],offs=[],spans=[],idx=0,speaking=false,timer=null,fs=1;
 
 // Éjszakai mód: automatikus este, kézzel is váltható
@@ -127,14 +128,14 @@ function themeMeta(){document.querySelector('meta[name=theme-color]').content=do
 window.toggleNight=()=>{document.body.classList.toggle("night");try{localStorage.nightPref=JSON.stringify({d:new Date().toDateString(),v:document.body.classList.contains("night")})}catch(e){}themeMeta()};
 
 const grad=s=>`linear-gradient(135deg,${s.bg[0]},${s.bg[1]})`;
-function daily(){const d=Math.floor(Date.now()/864e5),s=S[d%S.length];
+function daily(){const P=S.filter(x=>!x.custom),d=Math.floor(Date.now()/864e5),s=P[d%P.length];
  $("daily").style.background=grad(s);
  $("daily").innerHTML=`<div class="e">${s.emoji}</div><div><small>🌟 Mai esti mese</small><b>${s.title}</b><small>${s.min} perc</small></div>`;
  $("daily").onclick=()=>open(s.id)}
 function chips(){$("chips").innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="chip ${k==cat?"on":""}" data-k="${k}">${v}</button>`).join("");
  document.querySelectorAll(".chip[data-k]").forEach(b=>b.onclick=()=>{cat=b.dataset.k;chips();list()})}
 function list(){const q=$("q").value.toLowerCase();
- $("grid").innerHTML=S.filter(s=>(cat=="all"||s.cat==cat||(cat=="hosszu"&&s.min>=6))&&s.title.toLowerCase().includes(q)).map(s=>
+ $("grid").innerHTML=S.filter(s=>(cat=="all"||s.cat==cat||(cat=="hosszu"&&s.min>=6)||(cat=="own"&&s.custom))&&s.title.toLowerCase().includes(q)).map(s=>
  `<div class="card" data-id="${s.id}"><div class="img" style="background:${grad(s)}">${s.emoji}</div><div class="t">${s.title}<small>${s.min} perc</small></div></div>`).join("");
  document.querySelectorAll(".card").forEach(c=>c.onclick=()=>open(c.dataset.id))}
 $("q").oninput=list;
@@ -192,12 +193,14 @@ $("rate").onchange=()=>{if(speaking)speak()};$("voice").onchange=()=>{if(speakin
 $("fs").onclick=()=>{fs=fs>=1.4?0.9:fs+0.2;document.documentElement.style.setProperty("--fs",fs)};
 
 // Megosztás: link + QR
+function shareText(){const tx=cur.title+"\n\n"+cur.text.join("\n\n");
+ if(navigator.share)navigator.share({title:cur.title,text:tx}).catch(()=>{});else{navigator.clipboard&&navigator.clipboard.writeText(tx);toast("A mese szövege a vágólapra másolva")}}
 function showShare(url,title){$("mt").textContent=title;$("lnk").textContent=url;$("qr").innerHTML="";if(window.QRCode)new QRCode($("qr"),{text:url,width:180,height:180});else $("qr").textContent="A QR-kód csak online készíthető";
  $("copy").textContent="Link másolása";$("instShare").style.display=standalone?"none":"inline-block";$("modal").classList.add("open");
  $("copy").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(url);$("copy").textContent="Másolva ✓"};
  $("nat").style.display=navigator.share?"inline-block":"none";
  $("nat").onclick=()=>navigator.share({title:"2mese és alvás",text:title,url}).catch(()=>{})}
-$("share").onclick=()=>showShare(location.origin+location.pathname+"#"+cur.id,"Oszd meg a mesét: "+cur.title);
+$("share").onclick=()=>cur.custom?shareText():showShare(location.origin+location.pathname+"#"+cur.id,"Oszd meg a mesét: "+cur.title);
 window.homeShare=()=>showShare(location.origin+location.pathname,"Oszd meg a 2mese és alvás appot");
 $("close").onclick=()=>$("modal").classList.remove("open");
 
@@ -225,11 +228,11 @@ function spin(){if(spinning)return;spinning=true;$("wres").innerHTML="🎶";$("s
  })(t0)}
 $("spin").onclick=spin;
 $("wclose").onclick=()=>{try{speechSynthesis.cancel()}catch(e){}$("wheelModal").classList.remove("open")};
-window.onpopstate=()=>{if($("reader").classList.contains("open"))closeReader(true);$("modal").classList.remove("open");$("wheelModal").classList.remove("open")};
+window.onpopstate=()=>{window.alkotoPop&&alkotoPop();if($("reader").classList.contains("open"))closeReader(true);$("modal").classList.remove("open");$("wheelModal").classList.remove("open")};
 document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>({
  home:()=>{cat="all";$("q").value="";chips();list();scrollTo({top:0,behavior:"smooth"})},
  list:()=>$("chips").scrollIntoView({behavior:"smooth",block:"start"}),
- wheel:openWheel,night:()=>window.toggleNight(),share:()=>window.homeShare()})[b.dataset.a]());
+ wheel:openWheel,mk:()=>openCreator(),night:()=>window.toggleNight(),share:()=>window.homeShare()})[b.dataset.a]());
 // Frissítés: kézi gomb + automatikus ellenőrzés
 function toast(m){const e=$("toast");e.textContent=m;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),3200)}
 async function hardRefresh(){try{for(const k of await caches.keys())await caches.delete(k);const r=await navigator.serviceWorker.getRegistration();r&&await r.update()}catch(e){}location.reload()}
