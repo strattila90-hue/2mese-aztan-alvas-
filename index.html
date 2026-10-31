@@ -107,7 +107,7 @@ body.night *{box-shadow:none!important}
  <div id="wres"></div>
  <button class="play" id="spin" style="width:auto;padding:0 28px;border-radius:30px">Pörgess!</button>
  <button class="chip" id="wclose" style="margin-left:6px">Bezár</button></div></div>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="qr.js"></script>
 <script src="stories.js"></script>
 <script src="stories-uj.js"></script>
 <script src="stories-3.js"></script>
@@ -195,7 +195,7 @@ $("fs").onclick=()=>{fs=fs>=1.4?0.9:fs+0.2;document.documentElement.style.setPro
 // Megosztás: link + QR
 function shareText(){const tx=cur.title+"\n\n"+cur.text.join("\n\n");
  if(navigator.share)navigator.share({title:cur.title,text:tx}).catch(()=>{});else{navigator.clipboard&&navigator.clipboard.writeText(tx);toast("A mese szövege a vágólapra másolva")}}
-function showShare(url,title){$("mt").textContent=title;$("lnk").textContent=url;$("qr").innerHTML="";if(window.QRCode)new QRCode($("qr"),{text:url,width:180,height:180});else $("qr").textContent="A QR-kód csak online készíthető";
+function showShare(url,title){$("mt").textContent=title;$("lnk").textContent=url;$("qr").innerHTML="";drawQR($("qr"),url,200);
  $("copy").textContent="Link másolása";$("instShare").style.display=standalone?"none":"inline-block";$("modal").classList.add("open");
  $("copy").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(url);$("copy").textContent="Másolva ✓"};
  $("nat").style.display=navigator.share?"inline-block":"none";
