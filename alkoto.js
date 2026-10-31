@@ -88,8 +88,16 @@ try{JSON.parse(localStorage.getItem(K)||"[]").forEach(s=>{s.custom=true;S().push
 // --- történet építése
 let st=null,deal=[],step="home",snd=true;
 const chr=id=>CH.find(c=>c.id===id);
-const ctx=()=>{const [a,b,g]=st.ch.map(chr);return{H:a.n,Hb:a.b,Hd:a.d,F:b.n,G:g?g.n:"",S:SE.find(s=>s.id===st.se).in,Hq:cap(a.n)+" "+QU[a.id],Fq:cap(b.n)+" "+QU[b.id],sd:SD[st.se]}};
-const intro=()=>{const c=ctx();return rnd([`Hol volt, hol nem volt, ${c.S} élt ${c.H} és ${c.F}.`,`Egyszer régen ${c.S} lakott ${c.H} és ${c.F}.`,`Mesélik, hogy ${c.S} élt ${c.H} és ${c.F}.`])+" "+c.sd+" "+rnd(["Jó barátok voltak, és sosem unatkoztak.","Együtt reggeliztek, együtt nevettek, és együtt álmodtak.","Nem volt olyan nap, hogy ne találtak volna ki valami újat."])+" "+c.Hq};
+const kind=x=>x.n.replace(/^(a|az) /,"");
+function dat(n){const w=n.trim(),low=w.toLowerCase().split(/\s+/).pop(),vs=[...low].filter(ch=>"aáeéiíoóöőuúüű".includes(ch));
+ const nn=[...vs].reverse().find(v=>!"ieéí".includes(v)),back=nn?"aáoóuú".includes(nn):false;let base=w;const end=w.slice(-1);
+ if(end==="a"||end==="A")base=w.slice(0,-1)+"á";else if(end==="e"||end==="E")base=w.slice(0,-1)+"é";return base+(back?"nak":"nek")}
+const cleanName=s=>{s=String(s||"").replace(/[^\p{L} '’-]/gu,"").replace(/\s+/g," ").trim().slice(0,20);return s?cap(s):""};
+const ctx=()=>{const [a,b,g]=st.ch.map(chr),[n1,n2]=st.nm||["",""],H=n1||a.n,F=n2||b.n;
+ return{H,Hb:n1||a.b,Hd:n1?dat(n1):a.d,F,G:g?g.n:"",S:SE.find(s=>s.id===st.se).in,Hq:cap(H)+" "+QU[a.id],Fq:cap(F)+" "+QU[b.id],sd:SD[st.se]}};
+const spec=()=>{const [a,b]=st.ch.map(chr),[n1,n2]=st.nm||["",""];
+ if(n1&&n2)return `${n1} ${kind(a)} volt, ${n2} pedig ${kind(b)}.`;if(n1)return `${n1} ${kind(a)} volt.`;if(n2)return `${n2} ${kind(b)} volt.`;return""};
+const intro=()=>{const c=ctx(),sp=spec();return rnd([`Hol volt, hol nem volt, ${c.S} élt ${c.H} és ${c.F}.`,`Egyszer régen ${c.S} lakott ${c.H} és ${c.F}.`,`Mesélik, hogy ${c.S} élt ${c.H} és ${c.F}.`])+" "+(sp?sp+" ":"")+c.sd+" "+rnd(["Jó barátok voltak, és sosem unatkoztak.","Együtt reggeliztek, együtt nevettek, és együtt álmodtak.","Nem volt olyan nap, hogy ne találtak volna ki valami újat."])+" "+c.Hq};
 const outro=()=>{const c=ctx(),H=cap(c.H);return rnd([`A nap lassan lement, és a csillagok egyenként kigyulladtak. ${H} és ${c.F} nagyot ásított. – Holnap folytatjuk – mondta ${c.H}. – Holnap folytatjuk – ismételte ${c.F}, aztán már csak a szuszogásuk hallatszott. Jó éjszakát!`,`Hazafelé már alig bírták nyitva tartani a szemüket. A Hold is álmosan pislogott az égen. ${H} és ${c.F} egymás mellé kuporodtak, és a világ egyszerre nagyon csendes lett. Jó éjszakát!`,`Leszállt az este. Valahol messze egy bagoly huhogott, a szél pedig halkan dúdolt. ${H} és ${c.F} bebújtak a takaró alá. Először ${c.H} aludt el, aztán ${c.F} is. Jó éjszakát!`])};
 const autoTitle=()=>{const c=ctx();return cap(`${c.H} és ${c.F} meséje`)};
 const PG=["#ffd6e0,#ffb3c6","#d4f1c5,#a8e6a1","#cfe3ff,#9ec5ff","#ffe9b8,#ffd27a","#e6d4ff,#c9a8ff","#c8f1f0,#8fe0dc","#ffd9c2,#ffb48a","#f6e0f0,#e8b4dc"];
@@ -118,12 +126,17 @@ function ensureUI(){if(Q("creator"))return;
 .pickbar{text-align:center;font-size:34px;min-height:48px;margin:4px 0}
 .sticky{position:sticky;bottom:0;padding:12px 0 6px;background:linear-gradient(transparent,var(--bg) 35%)}
 body.night .pic{filter:brightness(.7) saturate(.8)}
+#creator .top{left:0;right:0;top:0;padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top));background:var(--bg);gap:8px;align-items:center}
+#creator #cStep{flex:1;text-align:center;line-height:1.25;font-size:17px}#cStep small{letter-spacing:3px;color:var(--pri);font-size:12px}
+.cbar{position:fixed;left:0;right:0;bottom:0;display:none;gap:8px;align-items:center;padding:12px 12px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 30%);z-index:4}
+.cbar .chip{min-height:52px;font-size:17px;padding:10px 14px;white-space:nowrap}.cbar .chip.big{padding:12px 18px}.cbar .go{margin-left:auto}
+.nm{background:var(--card);border-radius:22px;padding:12px;margin:12px 0}.nmh{display:flex;gap:12px;align-items:center}.nmh .pic{flex:none;width:72px;height:72px;margin:0}.nmh .pic .e{font-size:42px}.nmh b{display:block;margin-bottom:6px}
+.nm .chips2{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.nm .chip{padding:8px 14px}
 #creator textarea,#creator input.search{width:100%}#creator textarea{min-height:48vh;border-radius:18px;padding:14px;font:inherit;font-size:17px;border:2px solid #0001;background:var(--card);color:var(--tx)}`;
  document.head.appendChild(css);
- document.body.insertAdjacentHTML("beforeend",`<section class="reader" id="creator"><div class="top"><button class="chip" id="cBack">← Vissza</button><b id="cStep"></b><button class="round" id="cX">✕</button></div><div class="story" id="cBody" style="font-size:17px;padding-top:30px"></div></section>`);
- Q("cBody").onclick=e=>{const t=e.target.closest("[data-a]");if(t&&!t.disabled)act(t.dataset.a,t.dataset.v)};
- Q("cX").onclick=()=>closeCreator();
- Q("cBack").onclick=()=>{if(step==="home")return closeCreator();if(step==="plot"&&st.beats.length&&!confirm("A félkész mese elvész. Kilépsz?"))return;go("home")}}
+ document.body.insertAdjacentHTML("beforeend",`<section class="reader" id="creator"><div class="top"><button class="round" id="cBack" title="Vissza">←</button><b id="cStep"></b><button class="round" id="cX" title="Bezárás">✕</button></div><div class="story" id="cBody" style="font-size:17px;padding-top:24px"></div><div class="cbar" id="cbar"></div></section>`);
+ const h=e=>{const t=e.target.closest("[data-a]");if(t&&!t.disabled)act(t.dataset.a,t.dataset.v)};
+ Q("cBody").onclick=h;Q("cbar").onclick=h;Q("cX").onclick=()=>closeCreator();Q("cBack").onclick=()=>goBack()}
 function openCreator(){ensureUI();const c=Q("creator");if(!c.classList.contains("open")){if(history.state&&history.state.r)history.replaceState({r:1},"","#alkoto");else history.pushState({r:1},"","#alkoto")}
  c.classList.add("open");document.body.classList.add("lock");go("home")}
 function hideCreator(){try{speechSynthesis.cancel()}catch(e){}Q("creator").classList.remove("open")}
@@ -132,39 +145,55 @@ function closeCreator(fromPop){hideCreator();document.body.classList.remove("loc
 window.alkotoPop=()=>{const c=Q("creator");if(c&&c.classList.contains("open"))closeCreator(true)};
 window.openCreator=openCreator;
 
-const TITLES={home:"🧩 Mesealkotó",chars:"Kik legyenek a szereplők?",set:"Hol játszódik?",plot:"Építsd a történetet!",fin:"Kész a mese!",list:"⭐ Saját meséim",edit:"Szerkesztés"};
-function go(s,arg){step=s;Q("creator").scrollTop=0;render(arg);if(s==="chars")say("Válassz két vagy három szereplőt! Ha rákoppintasz, megmondom, ki ő.");else if(s==="set")say("Hol játsszon a mese?")}
-function render(arg){Q("cStep").textContent=TITLES[step];const B=Q("cBody");({home:vHome,chars:vChars,set:vSet,plot:vPlot,fin:vFin,list:vList,edit:vEdit})[step](B,arg)}
-function vHome(B){B.innerHTML=`<div style="text-align:center"><div style="font-size:64px">🧩</div><h2>Alkossunk mesét együtt!</h2><p>Válasszátok ki a szereplőket és a helyszínt, aztán lapokból építsétek fel a történetet.</p><button class="chip big go" data-a="new">✨ Új mese alkotása</button><br><button class="chip big" data-a="list">⭐ Saját meséim (${mine().length})</button></div>`}
-function vChars(B){const sel=st.ch.map(id=>chr(id).e).join(" ");
- B.innerHTML=`<div class="pickbar">${sel||"👆 Koppints a képekre!"}</div><div class="cg">${CH.map((c,i)=>{const k=st.ch.indexOf(c.id);return `<div class="cc ${k>=0?"sel":""}" data-a="pc" data-v="${c.id}">${k>=0?`<span class="num">${k+1}</span>`:""}${pic(c.id,c.e,i)}<b>${cap(c.b)}</b></div>`}).join("")}</div><div class="row sticky"><button class="chip" data-a="snd">${snd?"🔊":"🔇"}</button><button class="chip big go" data-a="cnext" ${st.ch.length<2?"disabled":""}>Tovább →</button></div>`}
-function vSet(B){B.innerHTML=`<div class="cg" style="grid-template-columns:repeat(2,1fr)">${SE.map((s,i)=>`<div class="cc" data-a="ps" data-v="${s.id}">${pic(s.id,s.e,i+3)}<b>${s.t}</b></div>`).join("")}</div>`}
+const FLOW=["chars","names","set","plot","fin"];
+const PREV={chars:"home",names:"chars",set:"names",plot:"set",fin:"plot",list:"home",edit:"list"};
+const TITLES={home:"🧩 Mesealkotó",chars:"Kik legyenek a szereplők?",names:"Hogy hívják őket?",set:"Hol játszódik?",plot:"Építsd a történetet!",fin:"Kész a mese!",list:"⭐ Saját meséim",edit:"Szerkesztés"};
+const NAMES=["Pöfi","Bogi","Misi","Lili","Peti","Zsófi","Dóri","Bence","Panni","Gergő","Nóri","Kata"];
+const SB=()=>`<button class="chip" data-a="snd" title="Hang">${snd?"🔊":"🔇"}</button>`;
+function bar(h){const b=Q("cbar");b.innerHTML=h;b.style.display=h?"flex":"none"}
+function saveNames(){if(Q("nm0"))st.nm=[cleanName(Q("nm0").value),cleanName(Q("nm1").value)]}
+function go(s,arg){step=s;Q("creator").scrollTop=0;render(arg);
+ const P={chars:"Válassz két vagy három szereplőt! Ha rákoppintasz, megmondom, ki ő.",names:"Hogy hívják a főhőst? Beírhatod a nevét, vagy választhatsz egyet.",set:"Hol játsszon a mese?"};if(P[s])say(P[s])}
+function goBack(){if(step==="home")return closeCreator();if(step==="names")saveNames();
+ if(step==="plot"&&st.beats.length&&!confirm("A félkész mese elvész. Biztosan visszalépsz?"))return;if(step==="fin")st.paras.pop();go(PREV[step])}
+function render(arg){const i=FLOW.indexOf(step);Q("cStep").innerHTML=(i>=0?`<small>${FLOW.map((_,k)=>k<=i?"●":"○").join(" ")}</small><br>`:"")+TITLES[step];
+ ({home:vHome,chars:vChars,names:vNames,set:vSet,plot:vPlot,fin:vFin,list:vList,edit:vEdit})[step](Q("cBody"),arg)}
+function vHome(B){bar("");B.innerHTML=`<div style="text-align:center"><div style="font-size:64px">🧩</div><h2>Alkossunk mesét együtt!</h2><p>Válasszátok ki a szereplőket, adjatok nekik nevet, és lapokból építsétek fel a történetet.</p><button class="chip big go" data-a="new">✨ Új mese alkotása</button><br><button class="chip big" data-a="list">⭐ Saját meséim (${mine().length})</button></div>`}
+function vChars(B){const sel=st.ch.map(id=>chr(id).e).join(" ");bar(SB()+`<button class="chip big go" data-a="cnext" ${st.ch.length<2?"disabled":""}>Tovább →</button>`);
+ B.innerHTML=`<div class="pickbar">${sel||"👆 Koppints a képekre!"}</div><div class="cg">${CH.map((c,i)=>{const k=st.ch.indexOf(c.id);return `<div class="cc ${k>=0?"sel":""}" data-a="pc" data-v="${c.id}">${k>=0?`<span class="num">${k+1}</span>`:""}${pic(c.id,c.e,i)}<b>${cap(c.b)}</b></div>`}).join("")}</div>`}
+function vNames(B){bar(`<button class="chip" data-a="back">← Vissza</button><button class="chip big go" data-a="nnext">Tovább →</button>`);
+ B.innerHTML=`<p style="text-align:center">Írd be a nevüket, vagy koppints egy névre. Nem kötelező, a nevet bármikor kihagyhatod!</p>`+[0,1].map(k=>{const c=chr(st.ch[k]);return `<div class="nm"><div class="nmh">${pic(c.id,c.e,k)}<div style="flex:1"><b>${k?"A barát":"A főhős"}: ${cap(c.b)}</b><input class="search" id="nm${k}" maxlength="20" placeholder="Írd be a nevét…" autocomplete="off" style="margin:0"></div></div><div class="chips2">${NAMES.map(n=>`<button class="chip" data-a="nm" data-v="${k}|${n}">${n}</button>`).join("")}</div></div>`}).join("");
+ Q("nm0").value=(st.nm||[])[0]||"";Q("nm1").value=(st.nm||[])[1]||""}
+function vSet(B){bar(`<button class="chip" data-a="back">← Vissza</button>`);B.innerHTML=`<div class="cg" style="grid-template-columns:repeat(2,1fr)">${SE.map((s,i)=>`<div class="cc" data-a="ps" data-v="${s.id}">${pic(s.id,s.e,i+3)}<b>${s.t}</b></div>`).join("")}</div>`}
 function vPlot(B){const n=st.beats.length;
+ bar((n?`<button class="chip" data-a="undo" title="Vissza egy lépést">↩️</button>`:"")+(n<MAXB?`<button class="chip" data-a="shuf">🔀 Más</button>`:"")+SB()+(n>=MINB?`<button class="chip big go" data-a="finish">🌙 Vége</button>`:""));
  B.innerHTML=`<div class="pv" id="pv">${st.paras.map(p=>`<p>${esc(p)}</p>`).join("")}</div>
  <div style="text-align:center;font-weight:700">${n<MAXB?`Mi történjen ezután? (${n}/${MAXB})`:"Elég hosszú lett – altassuk el őket!"}</div>
- ${n<MAXB?`<div class="cg" style="grid-template-columns:repeat(2,1fr)">${deal.map((b,i)=>`<div class="cc" data-a="pb" data-v="${b.id}">${pic(b.id,b.e,i)}<b>${b.t}</b><small>${b.c}</small></div>`).join("")}</div>`:""}
- <div class="row sticky">${n?`<button class="chip" data-a="undo">↩️</button>`:""}${n<MAXB?`<button class="chip" data-a="shuf">🔀 Más lapok</button>`:""}<button class="chip" data-a="snd">${snd?"🔊":"🔇"}</button>${n>=MINB?`<button class="chip big go" data-a="finish">🌙 Vége</button>`:""}</div>`;
+ ${n<MAXB?`<div class="cg" style="grid-template-columns:repeat(2,1fr)">${deal.map((b,i)=>`<div class="cc" data-a="pb" data-v="${b.id}">${pic(b.id,b.e,i)}<b>${b.t}</b><small>${b.c}</small></div>`).join("")}</div>`:""}`;
  const pv=Q("pv");pv.scrollTop=pv.scrollHeight}
-function vFin(B){B.innerHTML=`<div class="pv" style="max-height:none">${st.paras.map(p=>`<p>${esc(p)}</p>`).join("")}</div>
- <p><b>A mese címe:</b></p><input class="search" id="ttl" maxlength="80">
- <div class="row"><button class="chip" data-a="play">🔊 Meghallgatom</button><button class="chip big go" data-a="save">💾 Mentés</button><button class="chip" data-a="new">🔁 Újra</button></div>`;Q("ttl").value=autoTitle()}
-function vList(B){const m=mine();
- B.innerHTML=`<div class="row"><button class="chip go" data-a="new">✨ Új mese</button></div>`+(m.length?`<p style="text-align:center;font-size:14px;color:var(--sub)">▶ olvasás · ✏️ átnevezés · 📝 szerkesztés · 🗑️ törlés</p>`+m.map(s=>`<div class="li"><span class="e">${s.emoji}</span><b>${esc(s.title)}</b><div class="acts"><button class="round" data-a="read" data-v="${s.id}">▶</button><button class="round" data-a="ren" data-v="${s.id}">✏️</button><button class="round" data-a="ed" data-v="${s.id}">📝</button><button class="round" data-a="del" data-v="${s.id}">🗑️</button></div></div>`).join(""):`<p style="text-align:center">Még nincs saját mesétek. Alkossatok egyet! 🌙</p>`)}
+function vFin(B){bar(`<button class="chip" data-a="new">🔁 Újra</button><button class="chip" data-a="play">🔊 Meghallgatom</button><button class="chip big go" data-a="save">💾 Mentés</button>`);
+ B.innerHTML=`<div class="pv" style="max-height:none">${st.paras.map(p=>`<p>${esc(p)}</p>`).join("")}</div><p><b>A mese címe:</b></p><input class="search" id="ttl" maxlength="80">`;Q("ttl").value=autoTitle()}
+function vList(B){const m=mine();bar(`<button class="chip" data-a="back">← Vissza</button><button class="chip big go" data-a="new">✨ Új mese</button>`);
+ B.innerHTML=(m.length?`<p style="text-align:center;font-size:14px;color:var(--sub)">▶ olvasás · ✏️ átnevezés · 📝 szerkesztés · 🗑️ törlés</p>`+m.map(s=>`<div class="li"><span class="e">${s.emoji}</span><b>${esc(s.title)}</b><div class="acts"><button class="round" data-a="read" data-v="${s.id}">▶</button><button class="round" data-a="ren" data-v="${s.id}">✏️</button><button class="round" data-a="ed" data-v="${s.id}">📝</button><button class="round" data-a="del" data-v="${s.id}">🗑️</button></div></div>`).join(""):`<p style="text-align:center">Még nincs saját mesétek. Alkossatok egyet! 🌙</p>`)}
 function vEdit(B,id){const s=mine().find(x=>x.id===id);if(!s)return go("list");
- B.innerHTML=`<p><b>Cím:</b></p><input class="search" id="et" maxlength="80"><p><b>Szöveg</b> (a bekezdéseket üres sor választja el):</p><textarea id="ex"></textarea><div class="row"><button class="chip big go" data-a="esave" data-v="${id}">💾 Mentés</button><button class="chip" data-a="list">Mégse</button></div>`;
+ bar(`<button class="chip" data-a="list">Mégse</button><button class="chip big go" data-a="esave" data-v="${id}">💾 Mentés</button>`);
+ B.innerHTML=`<p><b>Cím:</b></p><input class="search" id="et" maxlength="80"><p><b>Szöveg</b> (a bekezdéseket üres sor választja el):</p><textarea id="ex"></textarea>`;
  Q("et").value=s.title;Q("ex").value=s.text.join("\n\n")}
 
 function act(a,v){const f=id=>mine().find(x=>x.id===id);
  switch(a){
- case"new":st={ch:[],se:null,beats:[],paras:[]};go("chars");break;
+ case"new":st={ch:[],se:null,beats:[],paras:[],nm:["",""]};go("chars");break;
+ case"back":goBack();break;
+ case"nm":{const [k,n]=v.split("|");Q("nm"+k).value=n;say("A neve: "+n+".");break}
+ case"nnext":saveNames();go("set");break;
  case"list":go("list");break;
  case"pc":{const i=st.ch.indexOf(v),c=chr(v);if(i>=0){st.ch.splice(i,1);say("Kivettük: "+c.b+".")}else if(st.ch.length<3){st.ch.push(v);say(cap(c.n)+"! "+["Ő lesz a főhős.","Ő lesz a legjobb barát.","Ő lesz a vendég."][st.ch.length-1])}else say("Legfeljebb három szereplő lehet.");render();break}
- case"cnext":if(st.ch.length>=2)go("set");break;
+ case"cnext":if(st.ch.length>=2){st.nm=st.nm||["",""];go("names")}break;
  case"ps":{const s=SE.find(x=>x.id===v);st.se=v;st.beats=[];st.paras=[intro()];dealCards();go("plot");say(s.t+"! A mese "+s.in+" játszódik. "+st.paras[0]);break}
  case"pb":{const b=BT.find(x=>x.id===v);let p=cap(rnd(b.x)(ctx()).replace(/([.!?]) ([a-zöüóőúéáűí])/g,(m,x,y)=>x+" "+y.toUpperCase()));if(st.beats.length&&Math.random()<.6)p=rnd(CONN)+" "+p;st.beats.push(v);st.paras.push(p);dealCards();render();say(b.t+"! "+p);break}
  case"shuf":dealCards();render();break;
  case"undo":st.beats.pop();st.paras.pop();dealCards();render();break;
- case"snd":snd=!snd;if(!snd)try{speechSynthesis.cancel()}catch(e){}render();break;
+ case"snd":if(step==="names")saveNames();snd=!snd;if(!snd)try{speechSynthesis.cancel()}catch(e){}render();break;
  case"finish":st.paras.push(outro());go("fin");break;
  case"play":say(st.paras.join(" "));break;
  case"save":{const title=(Q("ttl").value||"").trim()||autoTitle();const words=st.paras.join(" ").split(/\s+/).length;
@@ -178,5 +207,5 @@ function act(a,v){const f=id=>mine().find(x=>x.id===id);
   s.title=t||s.title;s.text=p;persist();window.list&&list();window.toast&&toast("Mentve ✓");go("list");break}
  case"del":{const s=f(v);if(s&&confirm("Biztosan törlöd: „"+s.title+"”?")){S().splice(S().indexOf(s),1);persist();window.list&&list();render()}break}
  }}
-window.__alk={CH,SE,BT,QU,SD};
+window.__alk={CH,SE,BT,QU,SD,dat,cleanName};
 })();
