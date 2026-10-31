@@ -93,10 +93,42 @@ body.night *{box-shadow:none!important}
 .card .mn{position:absolute;bottom:8px;right:8px;background:#0006;color:#fff;border-radius:12px;padding:2px 8px;font-size:12px;font-weight:700}
 .card .ck{position:absolute;top:8px;right:8px;background:var(--green);color:#fff;border-radius:50%;width:24px;height:24px;display:grid;place-items:center;font-size:14px;font-weight:800}
 body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
+:root{--sb:0px}
+.round{width:52px;height:52px}.chip{min-height:46px}.play{width:68px;height:68px}
+.nav{max-width:720px;padding:8px}.nav button{min-height:66px;font-size:27px}.nav button small{font-size:12px}
+.drawer{position:fixed;top:0;bottom:0;left:0;width:min(86vw,320px);background:var(--card);z-index:10;transform:translateX(-102%);transition:transform .25s;overflow:auto;padding:calc(12px + env(safe-area-inset-top)) 14px 24px;box-shadow:6px 0 30px #0005}
+.drawer.open{transform:none}
+.dh{display:flex;align-items:center;gap:10px;margin-bottom:8px}.dh img{width:44px;height:44px;border-radius:12px}.dh b{flex:1;font-size:18px}
+.dsec{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);margin:18px 6px 6px}
+.dbtn{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;min-height:58px;padding:12px 16px;border-radius:18px;background:none;color:var(--tx);font-size:18px;text-align:left;margin:3px 0}
+.dbtn:active,.dbtn.on{background:var(--hl)}.dbtn small{color:var(--sub);font-size:14px}.sw{color:var(--pri)}
+.scrim{position:fixed;inset:0;background:#0006;opacity:0;pointer-events:none;transition:.25s;z-index:9}.scrim.on{opacity:1;pointer-events:auto}
+.panel{position:fixed;top:0;bottom:0;right:0;width:min(88vw,360px);background:var(--card);z-index:10;transform:translateX(102%);transition:transform .25s;overflow:auto;padding:calc(12px + env(safe-area-inset-top)) 16px 24px;box-shadow:-6px 0 30px #0005}.panel.open{transform:none}
+.prow{display:flex;gap:10px;align-items:center;padding:0 6px}.panel .chip{min-height:54px;font-size:19px;flex:1}
+.panel select{width:100%;padding:14px;border-radius:16px;font:inherit;font-size:17px;background:var(--bg);color:var(--tx);border:2px solid #0002}.panel input[type=range]{width:100%;height:40px;accent-color:var(--pri)}
+@media(min-width:700px){
+ main{max-width:1100px}.tiles{grid-template-columns:repeat(4,1fr)}.tile{min-height:130px}.tile b{font-size:19px}
+ .grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px}.card .img{height:150px}.card .big{font-size:78px}.card .t{font-size:17px}
+ .hero{min-height:190px}.hero .e{font-size:100px}.hero .ht b{font-size:29px}.pill{font-size:17px!important}
+ .greet b{font-size:28px}.search{font-size:18px;padding:16px 22px}.chip{font-size:17px;padding:12px 22px}
+ .story{font-size:calc(25px*var(--fs,1));max-width:780px}.box{max-width:440px}.wrap{width:min(440px,70vw)}
+ .nav button{font-size:30px}.nav button small{font-size:13px}
+}
+@media(min-width:900px){
+ :root{--sb:280px}body{padding-left:var(--sb)}
+ .drawer{transform:none;width:var(--sb);z-index:4;box-shadow:none;border-right:1px solid #0002}
+ #menuBtn,#dClose,.nav{display:none}
+ .reader{left:var(--sb)}.top{left:calc(var(--sb) + 12px)}.bar{left:calc(var(--sb) + 12px)}.install{left:calc(var(--sb) + 10px)}
+}
+@media(min-width:900px) and (orientation:landscape){
+ .cover{position:fixed;left:var(--sb);top:0;bottom:0;height:auto;width:30vw;border-radius:0 48px 48px 0;font-size:150px}
+ #reader .story{margin:0 0 0 30vw;max-width:none;padding:76px 56px 150px;font-size:calc(27px*var(--fs,1))}
+ .bar{left:calc(var(--sb) + 30vw + 24px);right:24px;max-width:none}
+}
 </style>
 </head>
 <body>
-<header><div style="display:flex;align-items:center;gap:12px"><img src="icon-192.png" alt="" width="46" height="46" style="border-radius:14px;box-shadow:0 3px 10px #0004"><div><h1>2mese és alvás</h1><small style="color:var(--sub)">Esti mesék 3–6 éveseknek</small></div></div><button class="round" id="upd" title="Frissítés">🔄</button></header>
+<header><div style="display:flex;align-items:center;gap:12px"><button class="round" id="menuBtn" title="Menü">☰</button><img src="icon-192.png" alt="" width="46" height="46" style="border-radius:14px;box-shadow:0 3px 10px #0004"><div><h1>2mese és alvás</h1><small style="color:var(--sub)">Esti mesék 3–6 éveseknek</small></div></div><button class="round" id="upd" title="Frissítés">🔄</button></header>
 <main>
  <div class="greet" id="greet"></div>
  <div class="hero" id="daily"></div>
@@ -112,13 +144,26 @@ body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
  <div class="top"><button class="chip" id="back">← Vissza</button><span><button class="round" id="share">🔗</button> <button class="round" id="fs">Aa</button> <button class="round" id="x">✕</button></span></div>
  <div class="cover" id="cover"></div>
  <article class="story" id="story"></article>
- <div class="bar"><button class="play" id="play">▶</button>
-  <button class="chip" id="sl" title="Alvásidőzítő">😴</button><select id="voice" title="Hang"></select>
-  <input type="range" id="rate" min="0.6" max="1.2" step="0.05" value="0.85" title="Sebesség"></div>
+ <div class="bar"><button class="play" id="play" title="Felolvasás">▶</button><button class="chip" id="gear" style="margin-left:auto">⚙️ Beállítások</button></div>
 </section>
 
 <div class="install" id="install"><img src="icon-192.png" width="44" height="44" style="border-radius:12px" alt=""><div><b>Telepítsd: 2mese és alvás</b><small>Offline is működik, ikon a kezdőképernyőn</small></div><button class="chip" id="instBtn">Telepítés</button><button class="x" id="instX">✕</button></div>
 <div class="modal" id="iosm"><div class="box"><b>📲 Telepítés iPhone-on</b><p style="text-align:left;line-height:1.8">1. Nyisd meg <b>Safariban</b><br>2. Koppints a <b>Megosztás</b> ⬆️ gombra<br>3. Válaszd: <b>Főképernyőhöz adás</b><br>4. Koppints: <b>Hozzáadás</b></p><button class="chip" id="iosx">Rendben</button></div></div>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer"><div class="dh"><img src="icon-192.png" alt=""><b>2mese és alvás</b><button class="round" id="dClose" title="Bezár">✕</button></div>
+ <div class="dsec">Menü</div>
+ <button class="dbtn" data-d="home"><span>🏠 Főoldal</span></button><button class="dbtn" data-d="mk"><span>🧩 Mesealkotó</span></button><button class="dbtn" data-d="wheel"><span>🎡 Szerencsekerék</span></button><button class="dbtn" data-d="own"><span>⭐ Saját meséim</span></button>
+ <div class="dsec">Kategóriák</div><div id="dcats"></div>
+ <div class="dsec">Beállítások</div>
+ <button class="dbtn" data-d="night"><span>🌙 Éjszakai mód</span><b class="sw" id="dnight"></b></button><button class="dbtn" data-d="upd"><span>🔄 Frissítés</span></button><button class="dbtn" data-d="inst" id="dinst"><span>📲 Telepítés</span></button><button class="dbtn" data-d="share"><span>🔗 App megosztása</span></button>
+</aside>
+<aside class="panel" id="panel"><div class="dh"><b>⚙️ Olvasás beállításai</b><button class="round" id="pClose" title="Bezár">✕</button></div>
+ <div class="dsec">🗣️ Hang</div><div class="prow"><select id="voice" title="Hang"></select></div>
+ <div class="dsec">🐢 Sebesség 🐇</div><div class="prow"><input type="range" id="rate" min="0.6" max="1.2" step="0.05" value="0.85" title="Sebesség"></div>
+ <div class="dsec">🔠 Betűméret</div><div class="prow"><button class="chip" id="fsm">A−</button><button class="chip" id="fsp">A+</button></div>
+ <div class="dsec">😴 Alvásidőzítő</div><div class="prow"><button class="chip" id="sl" title="Alvásidőzítő">😴 Ki</button></div>
+ <div class="dsec">🌙 Éjszakai mód</div><div class="prow"><button class="chip" id="pnight">Váltás</button></div>
+</aside>
 <div class="toast" id="toast"></div>
 <nav class="nav"><button data-a="home">🏠<small>Főoldal</small></button><button data-a="list">📚<small>Mesék</small></button><button data-a="mk">🧩<small>Alkotó</small></button><button data-a="wheel">🎡<small>Kerék</small></button><button data-a="night">🌙<small>Éjszaka</small></button><button data-a="share">🔗<small>Megosztás</small></button></nav>
 <div class="modal" id="modal"><div class="box"><b id="mt">Oszd meg</b><div id="qr"></div><small id="lnk" style="word-break:break-all"></small><br><br><button class="chip" id="copy">Link másolása</button> <button class="chip" id="instShare" style="display:none">📲 Telepítés</button> <button class="chip" id="nat" style="display:none">Küldés</button> <button class="chip" id="close">Bezár</button></div></div>
@@ -149,7 +194,7 @@ const h=new Date().getHours();
 let nd=null;try{nd=JSON.parse(localStorage.nightPref||"null")}catch(e){}
 if((nd&&nd.d===new Date().toDateString())?nd.v:(h>=19||h<6))document.body.classList.add("night");
 function themeMeta(){document.querySelector('meta[name=theme-color]').content=document.body.classList.contains("night")?"#16120f":"#fff7ec"}themeMeta();
-window.toggleNight=()=>{document.body.classList.toggle("night");try{localStorage.nightPref=JSON.stringify({d:new Date().toDateString(),v:document.body.classList.contains("night")})}catch(e){}themeMeta()};
+window.toggleNight=()=>{document.body.classList.toggle("night");try{localStorage.nightPref=JSON.stringify({d:new Date().toDateString(),v:document.body.classList.contains("night")})}catch(e){}themeMeta();window.updNight&&updNight()};
 
 const grad=s=>`linear-gradient(135deg,${s.bg[0]},${s.bg[1]})`;
 let seen=new Set();try{seen=new Set(JSON.parse(localStorage.seenS||"[]"))}catch(e){}
@@ -168,7 +213,7 @@ function tiles(){const n=S.filter(x=>x.custom).length;
  const T=[["wheel","🎡","Szerencsekerék","Pörgess egy mesét!","#f093fb,#f5576c"],["mk","🧩","Mesealkotó","Alkossatok együtt!","#4facfe,#0090d8"],["esti","🌙","Altatómesék","Rövid és álmos","#5f2c82,#49a09d"],["own","⭐","Saját meséim",n?n+" mese":"Még nincs","#f7971e,#e8a400"]];
  $("tiles").innerHTML=T.map(t=>`<button class="tile" data-t="${t[0]}" style="background:linear-gradient(135deg,${t[4]})"><span class="ti">${t[1]}</span><b>${t[2]}</b><small>${t[3]}</small></button>`).join("");
  document.querySelectorAll(".tile").forEach(b=>b.onclick=()=>{const k=b.dataset.t;if(k==="wheel")openWheel();else if(k==="mk")openCreator();else{cat=k;chips();list();$("chips").scrollIntoView({behavior:"smooth",block:"start"})}})}
-function chips(){$("chips").innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="chip ${k==cat?"on":""}" data-k="${k}">${v}<small>${S.filter(s=>inCat(s,k)).length}</small></button>`).join("");
+function chips(){drawerCats();$("chips").innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="chip ${k==cat?"on":""}" data-k="${k}">${v}<small>${S.filter(s=>inCat(s,k)).length}</small></button>`).join("");
  document.querySelectorAll(".chip[data-k]").forEach(b=>b.onclick=()=>{cat=b.dataset.k;chips();list()})}
 function list(){const q=$("q").value.toLowerCase(),L=S.filter(s=>inCat(s,cat)&&s.title.toLowerCase().includes(q));
  $("cnt").textContent=L.length+" mese";tiles();
@@ -210,7 +255,7 @@ let gen=0,sleepAt=0,sli=0;const SL=[0,15,30,45];
 function speak(){if(!("speechSynthesis" in window))return alert("Ez a böngésző nem tud felolvasni.");
  speechSynthesis.cancel();speaking=true;gen++;$("play").textContent="⏸";run(idx,gen)}
 function run(start,g){if(!speaking||g!==gen)return;
- if(sleepAt&&Date.now()>=sleepAt){stop();sleepAt=0;sli=0;$("sl").textContent="😴";toast("Jó éjszakát 🌙");return}
+ if(sleepAt&&Date.now()>=sleepAt){stop();sleepAt=0;sli=0;$("sl").textContent="😴 Ki";toast("Jó éjszakát 🌙");return}
  if(start>=words.length){mark(words.length);stop(true);return}
  const end=Math.min(words.length,start+28),seg=words.slice(start,end),so=[];let o=0;seg.forEach(w=>{so.push(o);o+=w.length+1});
  const u=new SpeechSynthesisUtterance(seg.join(" "));u.lang="hu-HU";u.rate=+$("rate").value;u.pitch=1.05;
@@ -223,7 +268,7 @@ function run(start,g){if(!speaking||g!==gen)return;
  clearInterval(timer);
  timer=setInterval(()=>{if(gotB||g!==gen)return;if(Date.now()-t0>1200){k=Math.min(k+1,seg.length-1);idx=start+k;mark(idx)}},Math.round(430/u.rate));
  speechSynthesis.speak(u)}
-$("sl").onclick=()=>{sli=(sli+1)%SL.length;if(SL[sli]){sleepAt=Date.now()+SL[sli]*6e4;$("sl").textContent="😴 "+SL[sli];toast("Elalvás-időzítő: "+SL[sli]+" perc, a hang fokozatosan halkul")}else{sleepAt=0;$("sl").textContent="😴"}};
+$("sl").onclick=()=>{sli=(sli+1)%SL.length;if(SL[sli]){sleepAt=Date.now()+SL[sli]*6e4;$("sl").textContent="😴 "+SL[sli]+" perc";toast("Elalvás-időzítő: "+SL[sli]+" perc, a hang fokozatosan halkul")}else{sleepAt=0;$("sl").textContent="😴 Ki"}};
 function stop(done){gen++;speaking=false;clearInterval(timer);if("speechSynthesis" in window)speechSynthesis.cancel();$("play").textContent="▶";if(done===true)idx=0}
 $("play").onclick=()=>speaking?stop():speak();
 $("rate").onchange=()=>{if(speaking)speak()};$("voice").onchange=()=>{if(speaking)speak()};
@@ -296,6 +341,27 @@ window.addEventListener("appinstalled",()=>hideInstall());
 if(ios)setTimeout(()=>maybeInstall(location.hash.length>1),2500);
 $("instBtn").onclick=doInstall;$("instX").onclick=()=>hideInstall(true);$("iosx").onclick=()=>$("iosm").classList.remove("open");
 $("instShare").onclick=()=>{$("modal").classList.remove("open");doInstall()};
+// Oldalról nyíló fülek: bal menü és jobb beállítás panel
+const dOpen=o=>{$("drawer").classList.toggle("open",o);$("scrim").classList.toggle("on",o)};
+const pOpen=o=>{$("panel").classList.toggle("open",o);$("scrim").classList.toggle("on",o)};
+function updNight(){$("dnight").textContent=document.body.classList.contains("night")?"BE":"KI"}
+function drawerCats(){const e=$("dcats");if(!e)return;e.innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="dbtn ${k==cat?"on":""}" data-k2="${k}"><span>${v}</span><small>${S.filter(s=>inCat(s,k)).length}</small></button>`).join("");
+ e.querySelectorAll("button").forEach(b=>b.onclick=()=>{const k=b.dataset.k2;closeAll();setTimeout(()=>{cat=k;chips();list();$("chips").scrollIntoView({behavior:"smooth"})},30)})}
+function closeAll(){dOpen(false);pOpen(false);if($("reader").classList.contains("open"))closeReader(true);window.alkotoPop&&alkotoPop()}
+const DA={home:()=>{cat="all";$("q").value="";chips();list();scrollTo({top:0,behavior:"smooth"})},mk:()=>openCreator(),wheel:()=>openWheel(),
+ own:()=>{cat="own";chips();list();$("chips").scrollIntoView({behavior:"smooth"})},upd:()=>checkUpdate(true),inst:()=>doInstall(),share:()=>window.homeShare()};
+document.querySelectorAll(".dbtn[data-d]").forEach(b=>b.onclick=()=>{const k=b.dataset.d;if(k==="night"){window.toggleNight();return}closeAll();setTimeout(DA[k],40)});
+$("menuBtn").onclick=()=>dOpen(true);$("dClose").onclick=()=>dOpen(false);$("scrim").onclick=()=>{dOpen(false);pOpen(false)};
+$("gear").onclick=()=>pOpen(true);$("pClose").onclick=()=>pOpen(false);$("pnight").onclick=()=>window.toggleNight();
+const setFs=v=>{fs=Math.min(1.7,Math.max(.8,+v.toFixed(2)));document.documentElement.style.setProperty("--fs",fs)};
+$("fsm").onclick=()=>setFs(fs-.15);$("fsp").onclick=()=>setFs(fs+.15);
+if(standalone)$("dinst").style.display="none";
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){dOpen(false);pOpen(false)}});
+let tx=0,ty=0;document.addEventListener("touchstart",e=>{const q=e.touches[0];tx=q.clientX;ty=q.clientY},{passive:true});
+document.addEventListener("touchend",e=>{const q=e.changedTouches[0],dx=q.clientX-tx;if(Math.abs(q.clientY-ty)>60)return;
+ if($("reader").classList.contains("open")){if(tx>innerWidth-24&&dx<-70)pOpen(true);else if(dx>70&&$("panel").classList.contains("open"))pOpen(false)}
+ else if(innerWidth<900){if(tx<24&&dx>70&&!document.body.classList.contains("lock"))dOpen(true);else if(dx<-70&&$("drawer").classList.contains("open"))dOpen(false)}},{passive:true});
+updNight();drawerCats();
 if('serviceWorker' in navigator){
  const had=!!navigator.serviceWorker.controller;let rl=false;
  navigator.serviceWorker.register('sw.js');

@@ -132,7 +132,10 @@ body.night .pic{filter:brightness(.7) saturate(.8)}
 .cbar .chip{min-height:52px;font-size:17px;padding:10px 14px;white-space:nowrap}.cbar .chip.big{padding:12px 18px}.cbar .go{margin-left:auto}
 .nm{background:var(--card);border-radius:22px;padding:12px;margin:12px 0}.nmh{display:flex;gap:12px;align-items:center}.nmh .pic{flex:none;width:72px;height:72px;margin:0}.nmh .pic .e{font-size:42px}.nmh b{display:block;margin-bottom:6px}
 .nm .chips2{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.nm .chip{padding:8px 14px}
-#creator textarea,#creator input.search{width:100%}#creator textarea{min-height:48vh;border-radius:18px;padding:14px;font:inherit;font-size:17px;border:2px solid #0001;background:var(--card);color:var(--tx)}`;
+#creator textarea,#creator input.search{width:100%}#creator textarea{min-height:48vh;border-radius:18px;padding:14px;font:inherit;font-size:17px;border:2px solid #0001;background:var(--card);color:var(--tx)}
+@media(min-width:700px){#creator .story{max-width:900px}#creator .cg{grid-template-columns:repeat(4,1fr)!important;gap:16px}.pic{width:104px;height:104px}.pic .e{font-size:62px}.cc b{font-size:18px}.cc small{font-size:14px}.pv{font-size:21px;max-height:40vh}.cbar{max-width:900px;margin:auto}.nmh .pic{width:84px;height:84px}}
+@media(min-width:1000px){#creator .cg{grid-template-columns:repeat(5,1fr)!important}}
+@media(min-width:900px){#creator .top,#creator .cbar{left:var(--sb,0px)}}`;
  document.head.appendChild(css);
  document.body.insertAdjacentHTML("beforeend",`<section class="reader" id="creator"><div class="top"><button class="round" id="cBack" title="Vissza">←</button><b id="cStep"></b><button class="round" id="cX" title="Bezárás">✕</button></div><div class="story" id="cBody" style="font-size:17px;padding-top:24px"></div><div class="cbar" id="cbar"></div></section>`);
  const h=e=>{const t=e.target.closest("[data-a]");if(t&&!t.disabled)act(t.dataset.a,t.dataset.v)};
