@@ -75,13 +75,35 @@ body.night *{box-shadow:none!important}
 .install{position:fixed;left:10px;right:10px;top:calc(8px + env(safe-area-inset-top));max-width:620px;margin:auto;background:var(--card);border-radius:24px;box-shadow:0 6px 24px #0005!important;padding:12px 14px;display:none;align-items:center;gap:10px;z-index:8}
 .install.on{display:flex}.install div{flex:1;font-size:15px}.install small{display:block;color:var(--sub)}
 .install .chip{background:var(--pri);color:#fff}.install .x{background:none;color:var(--sub);font-size:20px}
+.greet{display:flex;align-items:center;gap:12px;margin:2px 2px 14px}.greet .gi{font-size:42px;filter:drop-shadow(0 3px 4px #0003)}.greet b{font-size:23px;display:block;line-height:1.2}.greet small{color:var(--sub);font-size:15px}
+.hero{position:relative;overflow:hidden;min-height:150px;padding:20px 22px}
+.hero .sp{position:absolute;opacity:.55;pointer-events:none}.hero .s1{top:12px;right:18px;font-size:24px}.hero .s2{bottom:14px;right:64px;font-size:16px}.hero .s3{top:50px;right:60px;font-size:28px}
+.hero .e{font-size:76px;line-height:1;filter:drop-shadow(0 4px 6px #0004)}.hero .ht{flex:1}.hero .ht b{font-size:21px;line-height:1.2;margin:2px 0}
+.hero{text-shadow:0 1px 5px #0007}.pill{white-space:nowrap;font-size:14px!important;padding:7px 12px!important;display:inline-block;margin-top:10px;background:#ffffff40;border-radius:20px;padding:7px 14px;font-weight:700;font-size:15px}
+.last{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:20px;padding:10px 14px;margin:0 0 14px;cursor:pointer;box-shadow:0 3px 10px #0002}
+.last .le{font-size:30px;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;flex:none}.last div{flex:1;line-height:1.25}.last small{color:var(--sub);display:block}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 16px}
+.tile{position:relative;overflow:hidden;min-height:116px;border-radius:22px;padding:14px;color:#fff;text-align:left;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 4px 12px #0003}
+.tile .ti{position:absolute;top:10px;right:12px;font-size:40px;filter:drop-shadow(0 3px 4px #0003)}.tile b{font-size:17px;line-height:1.15}.tile small{opacity:.92;font-size:13px}.tile:active{transform:scale(.96)}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:6px 2px 8px;font-weight:800;font-size:19px}.sec small{color:var(--sub);font-weight:600;font-size:14px}
+.chip small{opacity:.7;margin-left:5px;font-size:12px}
+.card .img{position:relative;height:122px;overflow:hidden}.card .big{font-size:62px;line-height:1;filter:drop-shadow(0 4px 5px #0004)}
+.card .acc{position:absolute;opacity:.6;font-size:18px}.card .a1{top:40%;right:12px}.card .a2{bottom:12px;left:12px}
+.card .cb{position:absolute;top:8px;left:8px;background:#ffffffb0;border-radius:12px;padding:2px 7px;font-size:16px}
+.card .mn{position:absolute;bottom:8px;right:8px;background:#0006;color:#fff;border-radius:12px;padding:2px 8px;font-size:12px;font-weight:700}
+.card .ck{position:absolute;top:8px;right:8px;background:var(--green);color:#fff;border-radius:50%;width:24px;height:24px;display:grid;place-items:center;font-size:14px;font-weight:800}
+body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
 </style>
 </head>
 <body>
 <header><div style="display:flex;align-items:center;gap:12px"><img src="icon-192.png" alt="" width="46" height="46" style="border-radius:14px;box-shadow:0 3px 10px #0004"><div><h1>2mese és alvás</h1><small style="color:var(--sub)">Esti mesék 3–6 éveseknek</small></div></div><button class="round" id="upd" title="Frissítés">🔄</button></header>
 <main>
+ <div class="greet" id="greet"></div>
  <div class="hero" id="daily"></div>
+ <div id="last"></div>
+ <div class="tiles" id="tiles"></div>
  <input class="search" id="q" placeholder="🔍 Mese keresése…">
+ <div class="sec"><span>📚 Mesék</span><small id="cnt"></small></div>
  <div class="chips" id="chips"></div>
  <div class="grid" id="grid"></div>
 </main>
@@ -112,12 +134,14 @@ body.night *{box-shadow:none!important}
 <script src="stories-uj.js"></script>
 <script src="stories-3.js"></script>
 <script src="stories-hosszu.js"></script>
+<script src="stories-hosszu2.js"></script>
 <script src="stories-grimm.js"></script>
 <script src="stories-stilus.js"></script>
 <script src="alkoto.js"></script>
 <script>
 const S=window.STORIES,$=id=>document.getElementById(id);
-const CATS={all:"✨ Mind",esti:"🌙 Esti",nepmese:"📖 Népmese",allatos:"🐾 Állatos",own:"⭐ Saját",hosszu:"⏱ Hosszú (6+ perc)",tunderes:"🧚 Tündéres",kaland:"🧭 Kaland"};
+const CATS={all:"✨ Mind",esti:"🌙 Esti",nepmese:"🏰 Népmese",allatos:"🦊 Állatos",tunderes:"🧚 Tündéres",kaland:"🗺️ Kaland",hosszu:"⏳ Hosszú",own:"⭐ Saját"};
+const CI={esti:"🌙",nepmese:"🏰",allatos:"🦊",tunderes:"🧚",kaland:"🗺️",sajat:"⭐"},CN={esti:"Esti mese",nepmese:"Népmese",allatos:"Állatmese",tunderes:"Tündérmese",kaland:"Kalandmese",sajat:"Saját mese"},ACC={esti:["⭐","🌙"],nepmese:["📜","✨"],allatos:["🍃","🐾"],tunderes:["✨","🌸"],kaland:["🧭","⛰️"],sajat:["💫","⭐"]};
 let cat="all",cur=null,words=[],offs=[],spans=[],idx=0,speaking=false,timer=null,fs=1;
 
 // Éjszakai mód: automatikus este, kézzel is váltható
@@ -128,19 +152,32 @@ function themeMeta(){document.querySelector('meta[name=theme-color]').content=do
 window.toggleNight=()=>{document.body.classList.toggle("night");try{localStorage.nightPref=JSON.stringify({d:new Date().toDateString(),v:document.body.classList.contains("night")})}catch(e){}themeMeta()};
 
 const grad=s=>`linear-gradient(135deg,${s.bg[0]},${s.bg[1]})`;
+let seen=new Set();try{seen=new Set(JSON.parse(localStorage.seenS||"[]"))}catch(e){}
+function markSeen(id){seen.add(id);try{localStorage.seenS=JSON.stringify([...seen]);localStorage.lastS=id}catch(e){}}
+const inCat=(s,k)=>k=="all"||s.cat==k||(k=="hosszu"&&s.min>=6)||(k=="own"&&s.custom);
+function greet(){const x=new Date().getHours(),g=x<5||x>=21?["🌙","Jó éjszakát!","Ideje elaludni. Jöhet egy rövid, álmos mese?"]:x<10?["☀️","Jó reggelt!","Egy vidám mese a nap kezdéséhez?"]:x<18?["🌤️","Szép napot!","Mit mesélünk ma?"]:["🌆","Jó estét!","Jöhet az esti mese?"];
+ $("greet").innerHTML=`<span class="gi">${g[0]}</span><div><b>${g[1]}</b><small>${g[2]}</small></div>`}
 function daily(){const P=S.filter(x=>!x.custom),d=Math.floor(Date.now()/864e5),s=P[d%P.length];
- $("daily").style.background=grad(s);
- $("daily").innerHTML=`<div class="e">${s.emoji}</div><div><small>🌟 Mai esti mese</small><b>${s.title}</b><small>${s.min} perc</small></div>`;
+ $("daily").style.background="linear-gradient(180deg,#0000 0%,#0006 100%),"+grad(s);
+ $("daily").innerHTML=`<span class="sp s1">✨</span><span class="sp s2">⭐</span><span class="sp s3">🌙</span><div class="e">${s.emoji}</div><div class="ht"><small>🌟 Mai esti mese</small><b>${s.title}</b><span class="pill">▶ Hallgasd meg · ${s.min} perc</span></div>`;
  $("daily").onclick=()=>open(s.id)}
-function chips(){$("chips").innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="chip ${k==cat?"on":""}" data-k="${k}">${v}</button>`).join("");
+function renderLast(){let s=null;try{s=S.find(x=>x.id===localStorage.lastS)}catch(e){}
+ $("last").innerHTML=s?`<div class="last" id="lastc"><span class="le" style="background:${grad(s)}">${s.emoji}</span><div><small>🔁 Legutóbb hallgattátok</small><b>${s.title}</b></div><span style="font-size:22px">▶</span></div>`:"";
+ if(s)$("lastc").onclick=()=>open(s.id)}
+function tiles(){const n=S.filter(x=>x.custom).length;
+ const T=[["wheel","🎡","Szerencsekerék","Pörgess egy mesét!","#f093fb,#f5576c"],["mk","🧩","Mesealkotó","Alkossatok együtt!","#4facfe,#0090d8"],["esti","🌙","Altatómesék","Rövid és álmos","#5f2c82,#49a09d"],["own","⭐","Saját meséim",n?n+" mese":"Még nincs","#f7971e,#e8a400"]];
+ $("tiles").innerHTML=T.map(t=>`<button class="tile" data-t="${t[0]}" style="background:linear-gradient(135deg,${t[4]})"><span class="ti">${t[1]}</span><b>${t[2]}</b><small>${t[3]}</small></button>`).join("");
+ document.querySelectorAll(".tile").forEach(b=>b.onclick=()=>{const k=b.dataset.t;if(k==="wheel")openWheel();else if(k==="mk")openCreator();else{cat=k;chips();list();$("chips").scrollIntoView({behavior:"smooth",block:"start"})}})}
+function chips(){$("chips").innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="chip ${k==cat?"on":""}" data-k="${k}">${v}<small>${S.filter(s=>inCat(s,k)).length}</small></button>`).join("");
  document.querySelectorAll(".chip[data-k]").forEach(b=>b.onclick=()=>{cat=b.dataset.k;chips();list()})}
-function list(){const q=$("q").value.toLowerCase();
- $("grid").innerHTML=S.filter(s=>(cat=="all"||s.cat==cat||(cat=="hosszu"&&s.min>=6)||(cat=="own"&&s.custom))&&s.title.toLowerCase().includes(q)).map(s=>
- `<div class="card" data-id="${s.id}"><div class="img" style="background:${grad(s)}">${s.emoji}</div><div class="t">${s.title}<small>${s.min} perc</small></div></div>`).join("");
+function list(){const q=$("q").value.toLowerCase(),L=S.filter(s=>inCat(s,cat)&&s.title.toLowerCase().includes(q));
+ $("cnt").textContent=L.length+" mese";tiles();
+ $("grid").innerHTML=L.map(s=>{const c=s.cat||"esti",A=ACC[c]||["⭐","🌙"];
+ return `<div class="card" data-id="${s.id}"><div class="img" style="background:${grad(s)}"><span class="acc a1">${A[0]}</span><span class="acc a2">${A[1]}</span><span class="big">${s.emoji}</span><span class="cb">${CI[c]||"📖"}</span>${seen.has(s.id)?'<span class="ck">✓</span>':""}<span class="mn">⏱ ${s.min} perc</span></div><div class="t">${s.title}<small>${CN[c]||"Mese"}</small></div></div>`}).join("")||`<p style="grid-column:1/-1;text-align:center;color:var(--sub)">Nincs ilyen mese. Próbálj másik szót! 🌙</p>`;
  document.querySelectorAll(".card").forEach(c=>c.onclick=()=>open(c.dataset.id))}
 $("q").oninput=list;
 
-function open(id){stop();cur=S.find(s=>s.id===id);if(!cur)return;
+function open(id){stop();cur=S.find(s=>s.id===id);if(!cur)return;markSeen(id);
  if(history.state&&history.state.r)history.replaceState({r:1},"","#"+id);else history.pushState({r:1},"","#"+id);
  $("cover").style.background=grad(cur);$("cover").textContent=cur.emoji;
  words=[];let html=`<h2>${cur.title}</h2>`;
@@ -149,7 +186,7 @@ function open(id){stop();cur=S.find(s=>s.id===id);if(!cur)return;
  $("story").innerHTML=html;$("endBack").onclick=()=>closeReader();$("endWheel").onclick=()=>{closeReader();setTimeout(openWheel,400)};spans=[...document.querySelectorAll(".w")];
  let o=0;offs=words.map(w=>{const s=o;o+=w.length+1;return s});
  $("reader").classList.add("open");document.body.classList.add("lock");$("reader").scrollTop=0;idx=0;lm=-1}
-function closeReader(fromPop){stop();if(window.pendingUpdate){hardRefresh();return}$("reader").classList.remove("open");document.body.classList.remove("lock");
+function closeReader(fromPop){stop();renderLast();list();if(window.pendingUpdate){hardRefresh();return}$("reader").classList.remove("open");document.body.classList.remove("lock");
  if(!fromPop){if(history.state&&history.state.r)history.back();else history.replaceState(null,"",location.pathname)}}
 $("back").onclick=()=>closeReader();$("x").onclick=()=>closeReader();
 
@@ -266,7 +303,7 @@ if('serviceWorker' in navigator){
 checkUpdate(false);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate(false)});
 setInterval(()=>{if(!document.hidden)checkUpdate(false)},30*60*1000);
-daily();chips();list();
+greet();daily();renderLast();chips();list();
 if(location.hash.length>1)open(location.hash.slice(1));
 </script>
 </body>
