@@ -212,9 +212,9 @@ function renderLast(){let s=null;try{s=S.find(x=>x.id===localStorage.lastS)}catc
  $("last").innerHTML=s?`<div class="last" id="lastc"><span class="le" style="background:${grad(s)}">${s.emoji}</span><div><small>🔁 Legutóbb hallgattátok</small><b>${s.title}</b></div><span style="font-size:22px">▶</span></div>`:"";
  if(s)$("lastc").onclick=()=>open(s.id)}
 function tiles(){const n=S.filter(x=>x.custom).length;
- const T=[["wheel","🎡","Szerencsekerék","Pörgess egy mesét!","#f093fb,#f5576c"],["mk","🧩","Mesealkotó","Alkossatok együtt!","#4facfe,#0090d8"],["esti","🌙","Altatómesék","Rövid és álmos","#5f2c82,#49a09d"],["own","⭐","Saját meséim",n?n+" mese":"Még nincs","#f7971e,#e8a400"]];
+ const T=[["wheel","🎡","Szerencsekerék","Pörgess egy mesét!","#f093fb,#f5576c"],["mk","🧩","Mesealkotó","Alkossatok együtt!","#4facfe,#0090d8"],["esti","🌙","Altatómesék","Rövid és álmos","#5f2c82,#49a09d"],["own","⭐","Saját meséim",n?n+" mese · írj még!":"Írj egyet!","#f7971e,#e8a400"]];
  $("tiles").innerHTML=T.map(t=>`<button class="tile" data-t="${t[0]}" style="background:linear-gradient(135deg,${t[4]})"><span class="ti">${t[1]}</span><b>${t[2]}</b><small>${t[3]}</small></button>`).join("");
- document.querySelectorAll(".tile").forEach(b=>b.onclick=()=>{const k=b.dataset.t;if(k==="wheel")openWheel();else if(k==="mk")openCreator();else{cat=k;chips();list();$("chips").scrollIntoView({behavior:"smooth",block:"start"})}})}
+ document.querySelectorAll(".tile").forEach(b=>b.onclick=()=>{const k=b.dataset.t;if(k==="wheel")openWheel();else if(k==="mk")openCreator();else if(k==="own")openMine();else{cat=k;chips();list();$("chips").scrollIntoView({behavior:"smooth",block:"start"})}})}
 function chips(){drawerCats();$("chips").innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="chip ${k==cat?"on":""}" data-k="${k}">${v}<small>${S.filter(s=>inCat(s,k)).length}</small></button>`).join("");
  document.querySelectorAll(".chip[data-k]").forEach(b=>b.onclick=()=>{cat=b.dataset.k;chips();list()})}
 function list(){const q=$("q").value.toLowerCase(),L=S.filter(s=>inCat(s,cat)&&s.title.toLowerCase().includes(q));
@@ -351,7 +351,7 @@ function drawerCats(){const e=$("dcats");if(!e)return;e.innerHTML=Object.entries
  e.querySelectorAll("button").forEach(b=>b.onclick=()=>{const k=b.dataset.k2;closeAll();setTimeout(()=>{cat=k;chips();list();$("chips").scrollIntoView({behavior:"smooth"})},30)})}
 function closeAll(){dOpen(false);pOpen(false);if($("reader").classList.contains("open"))closeReader(true);window.alkotoPop&&alkotoPop()}
 const DA={home:()=>{cat="all";$("q").value="";chips();list();scrollTo({top:0,behavior:"smooth"})},mk:()=>openCreator(),wheel:()=>openWheel(),
- own:()=>{cat="own";chips();list();$("chips").scrollIntoView({behavior:"smooth"})},upd:()=>checkUpdate(true),inst:()=>doInstall(),share:()=>window.homeShare()};
+ own:()=>openMine(),upd:()=>checkUpdate(true),inst:()=>doInstall(),share:()=>window.homeShare()};
 document.querySelectorAll(".dbtn[data-d]").forEach(b=>b.onclick=()=>{const k=b.dataset.d;if(k==="night"){window.toggleNight();return}closeAll();setTimeout(DA[k],40)});
 $("menuBtn").onclick=()=>dOpen(true);$("dClose").onclick=()=>dOpen(false);$("scrim").onclick=()=>{dOpen(false);pOpen(false)};
 $("gear").onclick=()=>pOpen(true);$("pClose").onclick=()=>pOpen(false);$("pnight").onclick=()=>window.toggleNight();
