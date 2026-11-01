@@ -130,7 +130,7 @@ body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
 </style>
 </head>
 <body>
-<header><div style="display:flex;align-items:center;gap:12px"><button class="round" id="menuBtn" title="Menü">☰</button><img src="icon-192.png" alt="" width="46" height="46" style="border-radius:14px;box-shadow:0 3px 10px #0004"><div><h1>2mese és alvás</h1><small style="color:var(--sub)">Esti mesék 3–6 éveseknek · v<span id="verNum">--</span></small></div></div><button class="round" id="upd" title="Frissítés"><span id="updIcon">🔄</span><span id="updPct" style="display:none;font-size:12px">0%</span></button></header>
+<header><div style="display:flex;align-items:center;gap:12px"><button class="round" id="menuBtn" title="Menü">☰</button><img src="icon-192.png" alt="" width="46" height="46" style="border-radius:14px;box-shadow:0 3px 10px #0004"><div><h1>2mese és alvás</h1><small style="color:var(--sub)">Esti mesék 3–6 éveseknek · v<span id="verNum">--</span></small></div></div><div style="display:flex;gap:8px"><button class="round" id="debugBtn" title="Debug (Ctrl+Shift+D)" style="width:40px;height:40px;font-size:18px;background:#333;color:#0f0">🐛</button><button class="round" id="upd" title="Frissítés"><span id="updIcon">🔄</span><span id="updPct" style="display:none;font-size:12px">0%</span></button></div></header>
 <main>
  <div class="greet" id="greet"></div>
  <div class="hero" id="daily"></div>
@@ -193,12 +193,14 @@ body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
 <script src="alkoto.js"></script>
 <script src="covers.js"></script>
 <script src="images.js"></script>
+<script src="debug.js"></script>
 <script>
 const S=window.STORIES,$=id=>document.getElementById(id);
 const E=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 const CATS={all:"✨ Mind",esti:"🌙 Esti",nepmese:"🏰 Népmese",allatos:"🦊 Állatos",tunderes:"🧚 Tündéres",kaland:"🗺️ Kaland",hosszu:"⏳ Hosszú",own:"⭐ Saját",fav:"❤️ Kedvenc"};
 const CI={esti:"🌙",nepmese:"🏰",allatos:"🦊",tunderes:"🧚",kaland:"🗺️",sajat:"⭐"},CN={esti:"Esti mese",nepmese:"Népmese",allatos:"Állatmese",tunderes:"Tündérmese",kaland:"Kalandmese",sajat:"Saját mese"},ACC={esti:["⭐","🌙"],nepmese:["📜","✨"],allatos:["🍃","🐾"],tunderes:["✨","🌸"],kaland:["🧭","⛰️"],sajat:["💫","⭐"]};
 let cat="all",cur=null,words=[],offs=[],spans=[],idx=0,speaking=false,timer=null,fs=1;
+if(window.DEBUG){DEBUG.info('init','Stories loaded',{count:S.length,categories:Object.keys(CATS)})}
 
 // Éjszakai mód: automatikus este, kézzel is váltható
 const h=new Date().getHours();
@@ -229,28 +231,26 @@ function tiles(){const n=S.filter(x=>x.custom).length;
 function chips(){drawerCats();$("chips").innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="chip ${k==cat?"on":""}" data-k="${k}">${v}<small>${S.filter(s=>inCat(s,k)).length}</small></button>`).join("");
  document.querySelectorAll(".chip[data-k]").forEach(b=>b.onclick=()=>{cat=b.dataset.k;chips();list()})}
 function list(){const q=$("q").value.toLowerCase(),L=S.filter(s=>inCat(s,cat)&&s.title.toLowerCase().includes(q));
+ if(window.DEBUG){DEBUG.info('list','List generation',{category:cat,query:q,results:L.length})}
  $("cnt").textContent=L.length+" mese";tiles();
  $("grid").innerHTML=L.map(s=>{const c=s.cat||"esti",A=ACC[c]||["⭐","🌙"];
- let coverImg=null;
- try{if(window.ImageGenerator){const cached=window.ImageGenerator.getCached(s.id);if(cached)coverImg=cached}
- if(!coverImg&&window.CoverGenerator){coverImg=window.CoverGenerator.generate(s)}}catch(e){console.warn('Cover generation error:',e)}
- return `<div class="card" data-id="${s.id}"><div class="img" style="background:${grad(s)};${coverImg?'background-image:url('+coverImg+');background-size:cover;':''}" data-story-id="${s.id}"><span class="acc a1">${A[0]}</span><span class="acc a2">${A[1]}</span><span class="big">${s.emoji}</span><span class="cb">${CI[c]||"📖"}</span>${seen.has(s.id)?'<span class="ck">✓</span>':""}${fav.has(s.id)?'<span class="hf">❤️</span>':""}<span class="mn">⏱ ${s.min} perc</span></div><div class="t">${E(s.title)}<small>${CN[c]||"Mese"}</small></div></div>`}).join("")||`<p style="grid-column:1/-1;text-align:center;color:var(--sub)">Nincs ilyen mese. Próbálj másik szót! 🌙</p>`;
- document.querySelectorAll(".card").forEach(c=>c.onclick=()=>{try{open(c.dataset.id)}catch(e){console.error('Open error:',e);toast('❌ Hiba a mese megnyitásakor')}});
+ return `<div class="card" data-id="${s.id}"><div class="img" style="background:${grad(s)}"><span class="acc a1">${A[0]}</span><span class="acc a2">${A[1]}</span><span class="big">${s.emoji}</span><span class="cb">${CI[c]||"📖"}</span>${seen.has(s.id)?'<span class="ck">✓</span>':""}${fav.has(s.id)?'<span class="hf">❤️</span>':""}<span class="mn">⏱ ${s.min} perc</span></div><div class="t">${E(s.title)}<small>${CN[c]||"Mese"}</small></div></div>`}).join("")||`<p style="grid-column:1/-1;text-align:center;color:var(--sub)">Nincs ilyen mese. Próbálj másik szót! 🌙</p>`;
+ document.querySelectorAll(".card").forEach(c=>c.onclick=()=>{try{open(c.dataset.id)}catch(e){console.error('Open error:',e);toast('❌ Hiba a mese megnyitásakor');if(window.DEBUG)DEBUG.error('list','Card click error',e)}});
  // AI képek betöltése a háttérben (csak ha van internet)
- if(navigator.onLine&&window.ImageGenerator){try{window.ImageGenerator.preload(L,3)}catch(e){console.warn('Preload error:',e)}}}
+ if(navigator.onLine&&window.ImageGenerator){try{window.ImageGenerator.preload(L,3)}catch(e){console.warn('Preload error:',e);if(window.DEBUG)DEBUG.warn('list','Preload error',e)}}}
 $("q").oninput=list;
 
-function open(id){stop();cur=S.find(s=>s.id===id);if(!cur)return;markSeen(id);setTimeout(()=>{$("fav").textContent=fav.has(id)?"❤️":"🤍"},0);
+function open(id){if(window.DEBUG)DEBUG.info('open','Opening story',{id:id});stop();cur=S.find(s=>s.id===id);if(!cur){if(window.DEBUG)DEBUG.error('open','Story not found',{id:id});return}markSeen(id);setTimeout(()=>{$("fav").textContent=fav.has(id)?"❤️":"🤍"},0);
  if(history.state&&history.state.r)history.replaceState({r:1},"","#"+id);else history.pushState({r:1},"","#"+id);
  let coverImg=null;
  try{if(window.ImageGenerator){const cached=window.ImageGenerator.getCached(cur.id);if(cached)coverImg=cached}
- if(!coverImg&&window.CoverGenerator){coverImg=window.CoverGenerator.generate(cur)}}catch(e){console.warn('Cover generation error:',e)}
+ if(!coverImg&&window.CoverGenerator){coverImg=window.CoverGenerator.generate(cur)}}catch(e){console.warn('Cover generation error:',e);if(window.DEBUG)DEBUG.warn('open','Cover generation error',e)}
  $("cover").style.background=grad(cur)+(coverImg?';background-image:url('+coverImg+');background-size:cover;':'');
  $("cover").textContent=cur.emoji;
  $("coverLoader").style.display="none";
  // AI kép generálása a háttérben (csak ha van internet és nincs cache)
  const isSvg=coverImg&&coverImg.startsWith('data:image/svg');
- if(navigator.onLine&&window.ImageGenerator&&!isSvg){try{toast("🎨 Illusztráció generálása...");$("coverLoader").style.display="grid";window.ImageGenerator.generate(cur).then(img=>{if(img){$("cover").style.backgroundImage=`url(${img})`;toast("✨ Új illusztráció készült!");$("coverLoader").style.display="none"}else{$("coverLoader").style.display="none";toast("❌ Generálás sikertelen")}})}catch(e){console.error('Image generation error:',e);$("coverLoader").style.display="none";toast("❌ Generálási hiba")}}
+ if(navigator.onLine&&window.ImageGenerator&&!isSvg){try{toast("🎨 Illusztráció generálása...");$("coverLoader").style.display="grid";window.ImageGenerator.generate(cur).then(img=>{if(img){$("cover").style.backgroundImage=`url(${img})`;toast("✨ Új illusztráció készült!");$("coverLoader").style.display="none";if(window.DEBUG)DEBUG.info('open','Image generated successfully')}else{$("coverLoader").style.display="none";toast("❌ Generálás sikertelen");if(window.DEBUG)DEBUG.warn('open','Image generation failed')}})}catch(e){console.error('Image generation error:',e);$("coverLoader").style.display="none";toast("❌ Generálási hiba");if(window.DEBUG)DEBUG.error('open','Image generation error',e)}}
  words=[];let html=`<h2>${E(cur.title)}</h2>`;
  cur.text.forEach(p=>{html+="<p>"+p.split(/\s+/).map(w=>{words.push(w);return `<span class="w">${E(w)}</span>`}).join(" ")+"</p>"});
  html+=`<div class="end"><div style="font-size:48px">🌙</div><button class="chip" id="endBack">✓ Vége – vissza a menübe</button><br><button class="chip" id="endWheel">🎡 Másik mesét pörgetek</button></div>`;
@@ -408,10 +408,12 @@ setInterval(()=>{if(!document.hidden)checkUpdate(false)},30*60*1000);
 greet();daily();renderLast();chips();list();
 if(location.hash.length>1)open(location.hash.slice(1));
 // Verziószám megjelenítése
-fetch("version.json",{cache:"no-store"}).then(r=>r.json()).then(j=>{$("verNum").textContent=j.v}).catch(()=>{});
+fetch("version.json",{cache:"no-store"}).then(r=>r.json()).then(j=>{$("verNum").textContent=j.v;if(window.DEBUG)DEBUG.info('init','Version loaded',j.v)}).catch(e=>{if(window.DEBUG)DEBUG.error('init','Version load failed',e)});
+// Debug gomb
+if(window.DEBUG){$("debugBtn").onclick=()=>DEBUG.showPanel();DEBUG.info('init','Debug button initialized')}
 // Online/offline érzékelés
-window.addEventListener('online',()=>toast("🌐 Internet újra elérhető - AI képek generálhatók"));
-window.addEventListener('offline',()=>toast("📡 Nincs internet - offline mód aktiválva"));
+window.addEventListener('online',()=>{toast("🌐 Internet újra elérhető - AI képek generálhatók");if(window.DEBUG)DEBUG.info('network','Online')});
+window.addEventListener('offline',()=>{toast("📡 Nincs internet - offline mód aktiválva");if(window.DEBUG)DEBUG.info('network','Offline')});
 </script>
 </body>
 </html>
