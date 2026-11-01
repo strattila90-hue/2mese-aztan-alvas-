@@ -186,7 +186,7 @@ function generateDecorations(category, accent) {
 
 // Konvertálás Data URI-vá
 function svgToDataURI(svg) {
-  const encoded = encodeURIComponent(svg).replace(/'/g, '%27').replace(/"/g, '%22');
+  const encoded = encodeURIComponent(svg).replace(/'/g, '%27').replace(/"/g, '%22').replace(/\(/g, '%28').replace(/\)/g, '%29');
   return `data:image/svg+xml;charset=utf-8,${encoded}`;
 }
 
@@ -194,7 +194,7 @@ function svgToDataURI(svg) {
 function generateCover(story) {
   const category = story.cat || 'esti';
   const emoji = story.emoji || '📖';
-  const colors = story.bg || COVER_PATTERNS[category].bgGradient;
+  const colors = story.bg || (COVER_PATTERNS[category] || COVER_PATTERNS.esti).bgGradient;
 
   const svg = generateSVG(category, emoji, colors);
   return svgToDataURI(svg);
