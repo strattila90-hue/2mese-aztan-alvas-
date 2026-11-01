@@ -148,8 +148,8 @@ body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
  <div class="bar"><button class="play" id="play" title="Felolvasás">▶</button><button class="chip" id="gear" style="margin-left:auto">⚙️ Beállítások</button></div>
 </section>
 
-<div class="install" id="install"><img src="icon-192.png" width="44" height="44" style="border-radius:12px" alt=""><div><b>Telepítsd: 2mese és alvás</b><small>Offline is működik, ikon a kezdőképernyőn</small></div><button class="chip" id="instBtn">Telepítés</button><button class="x" id="instX">✕</button></div>
-<div class="modal" id="iosm"><div class="box"><b>📲 Telepítés iPhone-on</b><p style="text-align:left;line-height:1.8">1. Nyisd meg <b>Safariban</b><br>2. Koppints a <b>Megosztás</b> ⬆️ gombra<br>3. Válaszd: <b>Főképernyőhöz adás</b><br>4. Koppints: <b>Hozzáadás</b></p><button class="chip" id="iosx">Rendben</button></div></div>
+<div class="install" id="install"><img src="icon-192.png" width="44" height="44" style="border-radius:12px" alt=""><div><b>Telepítsd: 2mese és alvás</b><small id="instText">Offline is működik, ikon a kezdőképernyőn</small></div><button class="chip" id="instBtn">Telepítés</button><button class="x" id="instX">✕</button></div>
+<div class="modal" id="iosm"><div class="box"><b>📲 Telepítés iPhone-on</b><p style="text-align:left;line-height:1.8">1. Nyisd meg <b>Safariban</b><br>2. Koppints a <b>Megosztás</b> ⬆️ gombra (alul)<br>3. Görgess le: <b>Főképernyőhöz adás</b><br>4. Koppints: <b>Hozzáadás</b><br><br>✨ Így offline is működik!</p><button class="chip" id="iosx">Rendben</button></div></div>
 <div class="scrim" id="scrim"></div>
 <aside class="drawer" id="drawer"><div class="dh"><img src="icon-192.png" alt=""><b>2mese és alvás</b><button class="round" id="dClose" title="Bezár">✕</button></div>
  <div class="dsec">Menü</div>
@@ -188,6 +188,7 @@ body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
 <script src="stories-grimm.js"></script>
 <script src="stories-stilus.js"></script>
 <script src="alkoto.js"></script>
+<script src="covers.js"></script>
 <script>
 const S=window.STORIES,$=id=>document.getElementById(id);
 const E=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
@@ -225,14 +226,16 @@ function chips(){drawerCats();$("chips").innerHTML=Object.entries(CATS).map(([k,
  document.querySelectorAll(".chip[data-k]").forEach(b=>b.onclick=()=>{cat=b.dataset.k;chips();list()})}
 function list(){const q=$("q").value.toLowerCase(),L=S.filter(s=>inCat(s,cat)&&s.title.toLowerCase().includes(q));
  $("cnt").textContent=L.length+" mese";tiles();
- $("grid").innerHTML=L.map(s=>{const c=s.cat||"esti",A=ACC[c]||["⭐","🌙"];
- return `<div class="card" data-id="${s.id}"><div class="img" style="background:${grad(s)}"><span class="acc a1">${A[0]}</span><span class="acc a2">${A[1]}</span><span class="big">${s.emoji}</span><span class="cb">${CI[c]||"📖"}</span>${seen.has(s.id)?'<span class="ck">✓</span>':""}${fav.has(s.id)?'<span class="hf">❤️</span>':""}<span class="mn">⏱ ${s.min} perc</span></div><div class="t">${E(s.title)}<small>${CN[c]||"Mese"}</small></div></div>`}).join("")||`<p style="grid-column:1/-1;text-align:center;color:var(--sub)">Nincs ilyen mese. Próbálj másik szót! 🌙</p>`;
+ $("grid").innerHTML=L.map(s=>{const c=s.cat||"esti",A=ACC[c]||["⭐","🌙"],coverImg=window.CoverGenerator?window.CoverGenerator.generate(s):null;
+ return `<div class="card" data-id="${s.id}"><div class="img" style="background:${grad(s)};${coverImg?'background-image:url('+coverImg+');background-size:cover;':''}"><span class="acc a1">${A[0]}</span><span class="acc a2">${A[1]}</span><span class="big">${s.emoji}</span><span class="cb">${CI[c]||"📖"}</span>${seen.has(s.id)?'<span class="ck">✓</span>':""}${fav.has(s.id)?'<span class="hf">❤️</span>':""}<span class="mn">⏱ ${s.min} perc</span></div><div class="t">${E(s.title)}<small>${CN[c]||"Mese"}</small></div></div>`}).join("")||`<p style="grid-column:1/-1;text-align:center;color:var(--sub)">Nincs ilyen mese. Próbálj másik szót! 🌙</p>`;
  document.querySelectorAll(".card").forEach(c=>c.onclick=()=>open(c.dataset.id))}
 $("q").oninput=list;
 
 function open(id){stop();cur=S.find(s=>s.id===id);if(!cur)return;markSeen(id);setTimeout(()=>{$("fav").textContent=fav.has(id)?"❤️":"🤍"},0);
  if(history.state&&history.state.r)history.replaceState({r:1},"","#"+id);else history.pushState({r:1},"","#"+id);
- $("cover").style.background=grad(cur);$("cover").textContent=cur.emoji;
+ const coverImg=window.CoverGenerator?window.CoverGenerator.generate(cur):null;
+ $("cover").style.background=grad(cur)+(coverImg?';background-image:url('+coverImg+');background-size:cover;':'');
+ $("cover").textContent=cur.emoji;
  words=[];let html=`<h2>${E(cur.title)}</h2>`;
  cur.text.forEach(p=>{html+="<p>"+p.split(/\s+/).map(w=>{words.push(w);return `<span class="w">${E(w)}</span>`}).join(" ")+"</p>"});
  html+=`<div class="end"><div style="font-size:48px">🌙</div><button class="chip" id="endBack">✓ Vége – vissza a menübe</button><br><button class="chip" id="endWheel">🎡 Másik mesét pörgetek</button></div>`;
@@ -348,11 +351,12 @@ function maybeInstall(force){if(standalone||(!force&&snoozed()))return;$("instal
 function hideInstall(s){$("install").classList.remove("on");if(s)try{localStorage.instNo=Date.now()}catch(e){}}
 async function doInstall(){if(dip){dip.prompt();try{await dip.userChoice}catch(e){}dip=null;hideInstall();return}
  if(ios)$("iosm").classList.add("open");else toast("Chrome menü (⋮) → Alkalmazás telepítése")}
-window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();dip=e;maybeInstall(location.hash.length>1)});
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();dip=e;maybeInstall(true)});
 window.addEventListener("appinstalled",()=>hideInstall());
-if(ios)setTimeout(()=>maybeInstall(location.hash.length>1),2500);
+if(ios)setTimeout(()=>maybeInstall(true),2500);
 $("instBtn").onclick=doInstall;$("instX").onclick=()=>hideInstall(true);$("iosx").onclick=()=>$("iosm").classList.remove("open");
 $("instShare").onclick=()=>{$("modal").classList.remove("open");doInstall()};
+if(ios)$("instText").textContent="Add a kezdőképernyőhöz Safari megosztás gombjával";
 // Oldalról nyíló fülek: bal menü és jobb beállítás panel
 const dOpen=o=>{$("drawer").classList.toggle("open",o);$("scrim").classList.toggle("on",o)};
 const pOpen=o=>{$("panel").classList.toggle("open",o);$("scrim").classList.toggle("on",o)};
