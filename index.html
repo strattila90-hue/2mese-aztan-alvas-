@@ -91,6 +91,7 @@ body.night *{box-shadow:none!important}
 .card .acc{position:absolute;opacity:.6;font-size:18px}.card .a1{top:40%;right:12px}.card .a2{bottom:12px;left:12px}
 .card .cb{position:absolute;top:8px;left:8px;background:#ffffffb0;border-radius:12px;padding:2px 7px;font-size:16px}
 .card .mn{position:absolute;bottom:8px;right:8px;background:#0006;color:#fff;border-radius:12px;padding:2px 8px;font-size:12px;font-weight:700}
+.card .hf{position:absolute;top:7px;right:38px;font-size:19px;filter:drop-shadow(0 1px 2px #0005)}.sleepscr{position:fixed;inset:0;background:#000;z-index:30;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px}.sleepscr.on{display:flex}.sleepscr .sm{font-size:64px;opacity:.3;animation:flt 6s ease-in-out infinite}.sleepscr small{color:#444;font-size:15px}@keyframes flt{50%{transform:translateY(-14px)}}
 .card .ck{position:absolute;top:8px;right:8px;background:var(--green);color:#fff;border-radius:50%;width:24px;height:24px;display:grid;place-items:center;font-size:14px;font-weight:800}
 body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
 :root{--sb:0px}
@@ -141,7 +142,7 @@ body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
 </main>
 
 <section class="reader" id="reader">
- <div class="top"><button class="chip" id="back">← Vissza</button><span><button class="round" id="share">🔗</button> <button class="round" id="fs">Aa</button> <button class="round" id="x">✕</button></span></div>
+ <div class="top"><button class="chip" id="back">← Vissza</button><span><button class="round" id="fav" title="Kedvenc">🤍</button> <button class="round" id="share">🔗</button> <button class="round" id="fs">Aa</button> <button class="round" id="x">✕</button></span></div>
  <div class="cover" id="cover"></div>
  <article class="story" id="story"></article>
  <div class="bar"><button class="play" id="play" title="Felolvasás">▶</button><button class="chip" id="gear" style="margin-left:auto">⚙️ Beállítások</button></div>
@@ -162,8 +163,10 @@ body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
  <div class="dsec">🐢 Sebesség 🐇</div><div class="prow"><input type="range" id="rate" min="0.6" max="1.2" step="0.05" value="0.85" title="Sebesség"></div>
  <div class="dsec">🔠 Betűméret</div><div class="prow"><button class="chip" id="fsm">A−</button><button class="chip" id="fsp">A+</button></div>
  <div class="dsec">😴 Alvásidőzítő</div><div class="prow"><button class="chip" id="sl" title="Alvásidőzítő">😴 Ki</button></div>
+ <div class="dsec">🌑 Elalváshoz</div><div class="prow"><button class="chip" id="pdark">🌑 Sötét képernyő</button></div>
  <div class="dsec">🌙 Éjszakai mód</div><div class="prow"><button class="chip" id="pnight">Váltás</button></div>
 </aside>
+<div class="sleepscr" id="sleepscr"><div class="sm">🌙</div><small>Jó éjszakát! Koppints a felébresztéshez.</small></div>
 <div class="toast" id="toast"></div>
 <nav class="nav"><button data-a="home">🏠<small>Főoldal</small></button><button data-a="list">📚<small>Mesék</small></button><button data-a="mk">🧩<small>Alkotó</small></button><button data-a="wheel">🎡<small>Kerék</small></button><button data-a="night">🌙<small>Éjszaka</small></button><button data-a="share">🔗<small>Megosztás</small></button></nav>
 <div class="modal" id="modal"><div class="box"><b id="mt">Oszd meg</b><div id="qr"></div><small id="lnk" style="word-break:break-all"></small><br><br><button class="chip" id="copy">Link másolása</button> <button class="chip" id="instShare" style="display:none">📲 Telepítés</button> <button class="chip" id="nat" style="display:none">Küldés</button> <button class="chip" id="close">Bezár</button></div></div>
@@ -187,7 +190,8 @@ body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
 <script src="alkoto.js"></script>
 <script>
 const S=window.STORIES,$=id=>document.getElementById(id);
-const CATS={all:"✨ Mind",esti:"🌙 Esti",nepmese:"🏰 Népmese",allatos:"🦊 Állatos",tunderes:"🧚 Tündéres",kaland:"🗺️ Kaland",hosszu:"⏳ Hosszú",own:"⭐ Saját"};
+const E=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const CATS={all:"✨ Mind",esti:"🌙 Esti",nepmese:"🏰 Népmese",allatos:"🦊 Állatos",tunderes:"🧚 Tündéres",kaland:"🗺️ Kaland",hosszu:"⏳ Hosszú",own:"⭐ Saját",fav:"❤️ Kedvenc"};
 const CI={esti:"🌙",nepmese:"🏰",allatos:"🦊",tunderes:"🧚",kaland:"🗺️",sajat:"⭐"},CN={esti:"Esti mese",nepmese:"Népmese",allatos:"Állatmese",tunderes:"Tündérmese",kaland:"Kalandmese",sajat:"Saját mese"},ACC={esti:["⭐","🌙"],nepmese:["📜","✨"],allatos:["🍃","🐾"],tunderes:["✨","🌸"],kaland:["🧭","⛰️"],sajat:["💫","⭐"]};
 let cat="all",cur=null,words=[],offs=[],spans=[],idx=0,speaking=false,timer=null,fs=1;
 
@@ -199,9 +203,11 @@ function themeMeta(){document.querySelector('meta[name=theme-color]').content=do
 window.toggleNight=()=>{document.body.classList.toggle("night");try{localStorage.nightPref=JSON.stringify({d:new Date().toDateString(),v:document.body.classList.contains("night")})}catch(e){}themeMeta();window.updNight&&updNight()};
 
 const grad=s=>`linear-gradient(135deg,${s.bg[0]},${s.bg[1]})`;
+let fav=new Set();try{fav=new Set(JSON.parse(localStorage.favS||"[]"))}catch(e){}
+function setFav(id){fav.has(id)?fav.delete(id):fav.add(id);try{localStorage.favS=JSON.stringify([...fav])}catch(e){}}
 let seen=new Set();try{seen=new Set(JSON.parse(localStorage.seenS||"[]"))}catch(e){}
 function markSeen(id){seen.add(id);try{localStorage.seenS=JSON.stringify([...seen]);localStorage.lastS=id}catch(e){}}
-const inCat=(s,k)=>k=="all"||s.cat==k||(k=="hosszu"&&s.min>=6)||(k=="own"&&s.custom);
+const inCat=(s,k)=>k=="all"||s.cat==k||(k=="hosszu"&&s.min>=6)||(k=="own"&&s.custom)||(k=="fav"&&fav.has(s.id));
 function greet(){const x=new Date().getHours(),g=x<5||x>=21?["🌙","Jó éjszakát!","Ideje elaludni. Jöhet egy rövid, álmos mese?"]:x<10?["☀️","Jó reggelt!","Egy vidám mese a nap kezdéséhez?"]:x<18?["🌤️","Szép napot!","Mit mesélünk ma?"]:["🌆","Jó estét!","Jöhet az esti mese?"];
  $("greet").innerHTML=`<span class="gi">${g[0]}</span><div><b>${g[1]}</b><small>${g[2]}</small></div>`}
 function daily(){const P=S.filter(x=>!x.custom),d=Math.floor(Date.now()/864e5),s=P[d%P.length];
@@ -209,7 +215,7 @@ function daily(){const P=S.filter(x=>!x.custom),d=Math.floor(Date.now()/864e5),s
  $("daily").innerHTML=`<span class="sp s1">✨</span><span class="sp s2">⭐</span><span class="sp s3">🌙</span><div class="e">${s.emoji}</div><div class="ht"><small>🌟 Mai esti mese</small><b>${s.title}</b><span class="pill">▶ Hallgasd meg · ${s.min} perc</span></div>`;
  $("daily").onclick=()=>open(s.id)}
 function renderLast(){let s=null;try{s=S.find(x=>x.id===localStorage.lastS)}catch(e){}
- $("last").innerHTML=s?`<div class="last" id="lastc"><span class="le" style="background:${grad(s)}">${s.emoji}</span><div><small>🔁 Legutóbb hallgattátok</small><b>${s.title}</b></div><span style="font-size:22px">▶</span></div>`:"";
+ $("last").innerHTML=s?`<div class="last" id="lastc"><span class="le" style="background:${grad(s)}">${s.emoji}</span><div><small>🔁 Legutóbb hallgattátok</small><b>${E(s.title)}</b></div><span style="font-size:22px">▶</span></div>`:"";
  if(s)$("lastc").onclick=()=>open(s.id)}
 function tiles(){const n=S.filter(x=>x.custom).length;
  const T=[["wheel","🎡","Szerencsekerék","Pörgess egy mesét!","#f093fb,#f5576c"],["mk","🧩","Mesealkotó","Alkossatok együtt!","#4facfe,#0090d8"],["esti","🌙","Altatómesék","Rövid és álmos","#5f2c82,#49a09d"],["own","⭐","Saját meséim",n?n+" mese · írj még!":"Írj egyet!","#f7971e,#e8a400"]];
@@ -220,15 +226,15 @@ function chips(){drawerCats();$("chips").innerHTML=Object.entries(CATS).map(([k,
 function list(){const q=$("q").value.toLowerCase(),L=S.filter(s=>inCat(s,cat)&&s.title.toLowerCase().includes(q));
  $("cnt").textContent=L.length+" mese";tiles();
  $("grid").innerHTML=L.map(s=>{const c=s.cat||"esti",A=ACC[c]||["⭐","🌙"];
- return `<div class="card" data-id="${s.id}"><div class="img" style="background:${grad(s)}"><span class="acc a1">${A[0]}</span><span class="acc a2">${A[1]}</span><span class="big">${s.emoji}</span><span class="cb">${CI[c]||"📖"}</span>${seen.has(s.id)?'<span class="ck">✓</span>':""}<span class="mn">⏱ ${s.min} perc</span></div><div class="t">${s.title}<small>${CN[c]||"Mese"}</small></div></div>`}).join("")||`<p style="grid-column:1/-1;text-align:center;color:var(--sub)">Nincs ilyen mese. Próbálj másik szót! 🌙</p>`;
+ return `<div class="card" data-id="${s.id}"><div class="img" style="background:${grad(s)}"><span class="acc a1">${A[0]}</span><span class="acc a2">${A[1]}</span><span class="big">${s.emoji}</span><span class="cb">${CI[c]||"📖"}</span>${seen.has(s.id)?'<span class="ck">✓</span>':""}${fav.has(s.id)?'<span class="hf">❤️</span>':""}<span class="mn">⏱ ${s.min} perc</span></div><div class="t">${E(s.title)}<small>${CN[c]||"Mese"}</small></div></div>`}).join("")||`<p style="grid-column:1/-1;text-align:center;color:var(--sub)">Nincs ilyen mese. Próbálj másik szót! 🌙</p>`;
  document.querySelectorAll(".card").forEach(c=>c.onclick=()=>open(c.dataset.id))}
 $("q").oninput=list;
 
-function open(id){stop();cur=S.find(s=>s.id===id);if(!cur)return;markSeen(id);
+function open(id){stop();cur=S.find(s=>s.id===id);if(!cur)return;markSeen(id);setTimeout(()=>{$("fav").textContent=fav.has(id)?"❤️":"🤍"},0);
  if(history.state&&history.state.r)history.replaceState({r:1},"","#"+id);else history.pushState({r:1},"","#"+id);
  $("cover").style.background=grad(cur);$("cover").textContent=cur.emoji;
- words=[];let html=`<h2>${cur.title}</h2>`;
- cur.text.forEach(p=>{html+="<p>"+p.split(/\s+/).map(w=>{words.push(w);return `<span class="w">${w}</span>`}).join(" ")+"</p>"});
+ words=[];let html=`<h2>${E(cur.title)}</h2>`;
+ cur.text.forEach(p=>{html+="<p>"+p.split(/\s+/).map(w=>{words.push(w);return `<span class="w">${E(w)}</span>`}).join(" ")+"</p>"});
  html+=`<div class="end"><div style="font-size:48px">🌙</div><button class="chip" id="endBack">✓ Vége – vissza a menübe</button><br><button class="chip" id="endWheel">🎡 Másik mesét pörgetek</button></div>`;
  $("story").innerHTML=html;$("endBack").onclick=()=>closeReader();$("endWheel").onclick=()=>{closeReader();setTimeout(openWheel,400)};spans=[...document.querySelectorAll(".w")];
  let o=0;offs=words.map(w=>{const s=o;o+=w.length+1;return s});
@@ -254,10 +260,13 @@ function mark(i){if(lm<0||i<lm)spans.forEach((s,k)=>{s.classList.toggle("r",k<i)
  const r=el.getBoundingClientRect();
  if(r.bottom>innerHeight-170||r.top<110)R.scrollTo({top:el.offsetTop-R.clientHeight*0.35,behavior:"smooth"})}
 let gen=0,sleepAt=0,sli=0;const SL=[0,15,30,45];
+let wl=null;async function wakeOn(){try{if(navigator.wakeLock&&!wl){wl=await navigator.wakeLock.request("screen");wl.addEventListener("release",()=>{wl=null})}}catch(e){}}
+function wakeOff(){try{wl&&wl.release()}catch(e){}wl=null}
+function sleepNow(){pOpen(false);$("sleepscr").classList.add("on")}
 function speak(){if(!("speechSynthesis" in window))return alert("Ez a böngésző nem tud felolvasni.");
- speechSynthesis.cancel();speaking=true;gen++;$("play").textContent="⏸";run(idx,gen)}
+ speechSynthesis.cancel();speaking=true;wakeOn();gen++;$("play").textContent="⏸";run(idx,gen)}
 function run(start,g){if(!speaking||g!==gen)return;
- if(sleepAt&&Date.now()>=sleepAt){stop();sleepAt=0;sli=0;$("sl").textContent="😴 Ki";toast("Jó éjszakát 🌙");return}
+ if(sleepAt&&Date.now()>=sleepAt){stop();sleepAt=0;sli=0;$("sl").textContent="😴 Ki";toast("Jó éjszakát 🌙");sleepNow();return}
  if(start>=words.length){mark(words.length);stop(true);return}
  const end=Math.min(words.length,start+28),seg=words.slice(start,end),so=[];let o=0;seg.forEach(w=>{so.push(o);o+=w.length+1});
  const u=new SpeechSynthesisUtterance(seg.join(" "));u.lang="hu-HU";u.rate=+$("rate").value;u.pitch=1.05;
@@ -271,9 +280,10 @@ function run(start,g){if(!speaking||g!==gen)return;
  timer=setInterval(()=>{if(gotB||g!==gen)return;if(Date.now()-t0>1200){k=Math.min(k+1,seg.length-1);idx=start+k;mark(idx)}},Math.round(430/u.rate));
  speechSynthesis.speak(u)}
 $("sl").onclick=()=>{sli=(sli+1)%SL.length;if(SL[sli]){sleepAt=Date.now()+SL[sli]*6e4;$("sl").textContent="😴 "+SL[sli]+" perc";toast("Elalvás-időzítő: "+SL[sli]+" perc, a hang fokozatosan halkul")}else{sleepAt=0;$("sl").textContent="😴 Ki"}};
-function stop(done){gen++;speaking=false;clearInterval(timer);if("speechSynthesis" in window)speechSynthesis.cancel();$("play").textContent="▶";if(done===true)idx=0}
+function stop(done){gen++;speaking=false;wakeOff();clearInterval(timer);if("speechSynthesis" in window)speechSynthesis.cancel();$("play").textContent="▶";if(done===true)idx=0}
 $("play").onclick=()=>speaking?stop():speak();
 $("rate").onchange=()=>{if(speaking)speak()};$("voice").onchange=()=>{if(speaking)speak()};
+$("fav").onclick=()=>{if(!cur)return;setFav(cur.id);$("fav").textContent=fav.has(cur.id)?"❤️":"🤍";chips();list();toast(fav.has(cur.id)?"Kedvenc ❤️":"Kivéve a kedvencek közül")};
 $("fs").onclick=()=>{fs=fs>=1.4?0.9:fs+0.2;document.documentElement.style.setProperty("--fs",fs)};
 
 // Megosztás: link + QR
@@ -369,7 +379,8 @@ if('serviceWorker' in navigator){
  navigator.serviceWorker.register('sw.js');
  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!had||rl)return;rl=true;if($("reader").classList.contains("open")){window.pendingUpdate=true;toast("Új verzió kész – a mese végén frissítek ✨")}else location.reload()})}
 checkUpdate(false);
-document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate(false)});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){checkUpdate(false);if(speaking)wakeOn()}});
+$("pdark").onclick=sleepNow;$("sleepscr").onclick=()=>$("sleepscr").classList.remove("on");
 setInterval(()=>{if(!document.hidden)checkUpdate(false)},30*60*1000);
 greet();daily();renderLast();chips();list();
 if(location.hash.length>1)open(location.hash.slice(1));

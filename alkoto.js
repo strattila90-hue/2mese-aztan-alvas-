@@ -138,9 +138,15 @@ body.night .pic{filter:brightness(.7) saturate(.8)}
 @media(min-width:1000px){#creator .cg{grid-template-columns:repeat(5,1fr)!important}}
 @media(min-width:900px){#creator .top,#creator .cbar{left:var(--sb,0px)}}`;
  document.head.appendChild(css);
- document.body.insertAdjacentHTML("beforeend",`<section class="reader" id="creator"><div class="top"><button class="chip" id="cBack">← Vissza</button><b id="cStep"></b><button class="round" id="cSnd" title="Hang">🔊</button><button class="round" id="cX" title="Bezárás">✕</button></div><div class="story" id="cBody" style="font-size:17px;padding-top:24px"></div><div class="cbar" id="cbar"></div></section>`);
+ document.body.insertAdjacentHTML("beforeend",`<section class="reader" id="creator"><div class="top"><button class="chip" id="cBack">← Vissza</button><b id="cStep"></b><button class="round" id="cSnd" title="Hang">🔊</button><button class="round" id="cX" title="Bezárás">✕</button></div><div class="story" id="cBody" style="font-size:17px;padding-top:24px"></div><div class="cbar" id="cbar"></div></section><input type="file" id="impf" accept=".json,application/json" hidden>`);
  const h=e=>{const t=e.target.closest("[data-a]");if(t&&!t.disabled)act(t.dataset.a,t.dataset.v)};
- Q("cBody").onclick=h;Q("cbar").onclick=h;Q("cX").onclick=()=>closeCreator();Q("cBack").onclick=()=>goBack();Q("cSnd").onclick=()=>{snd=!snd;if(!snd)try{speechSynthesis.cancel()}catch(e){}Q("cSnd").textContent=snd?"🔊":"🔇"}}
+ Q("cBody").onclick=h;Q("cbar").onclick=h;Q("impf").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
+ try{const j=JSON.parse(await f.text()),arr=Array.isArray(j)?j:j.stories;let n=0;
+  (arr||[]).forEach(s=>{if(!s||!s.title||!Array.isArray(s.text))return;const tx=s.text.map(x=>String(x)).filter(Boolean);if(!tx.length)return;
+   S().push({id:"my-"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),title:String(s.title).slice(0,80),emoji:String(s.emoji||"📖").slice(0,4),bg:(Array.isArray(s.bg)&&s.bg.length===2)?s.bg.map(c=>String(c).replace(/[^#0-9a-fA-F]/g,"").slice(0,9)):rnd(GR),cat:"sajat",min:Math.max(1,+s.min||1),text:tx,custom:true});n++});
+  persist();window.list&&list();window.toast&&toast(n?n+" mese betöltve ✓":"Nem találtam mesét a fájlban");if(step==="list")render()}
+ catch(err){window.toast&&toast("Ez a fájl nem mesecsomag")}};
+ Q("cX").onclick=()=>closeCreator();Q("cBack").onclick=()=>goBack();Q("cSnd").onclick=()=>{snd=!snd;if(!snd)try{speechSynthesis.cancel()}catch(e){}Q("cSnd").textContent=snd?"🔊":"🔇"}}
 function openCreator(){ensureUI();const c=Q("creator");if(!c.classList.contains("open")){if(history.state&&history.state.r)history.replaceState({r:1},"","#alkoto");else history.pushState({r:1},"","#alkoto")}
  c.classList.add("open");document.body.classList.add("lock");go("home")}
 function hideCreator(){try{speechSynthesis.cancel()}catch(e){}Q("creator").classList.remove("open")}
@@ -180,7 +186,7 @@ function vPlot(B){const n=st.beats.length;
 function vFin(B){bar(BK+`<button class="chip" data-a="play" title="Meghallgatom">🔊</button><button class="chip big go" data-a="save">💾 Mentés</button>`);
  B.innerHTML=`<div class="pv" style="max-height:none">${st.paras.map(p=>`<p>${esc(p)}</p>`).join("")}</div><p><b>A mese címe:</b></p><input class="search" id="ttl" maxlength="80">`;Q("ttl").value=autoTitle()}
 function vList(B){const m=mine();bar(BK+`<button class="chip big go" data-a="write">✍️ Új mese írása</button>`);
- B.innerHTML=`<div class="row"><button class="chip" data-a="new">🧩 Mesealkotó játék</button></div>`+(m.length?`<p style="text-align:center;font-size:14px;color:var(--sub)">▶ olvasás · ✏️ átnevezés · 📝 szerkesztés · 🗑️ törlés</p>`+m.map(s=>`<div class="li"><span class="e">${s.emoji}</span><b>${esc(s.title)}</b><div class="acts"><button class="round" data-a="read" data-v="${s.id}">▶</button><button class="round" data-a="ren" data-v="${s.id}">✏️</button><button class="round" data-a="ed" data-v="${s.id}">📝</button><button class="round" data-a="del" data-v="${s.id}">🗑️</button></div></div>`).join(""):`<p style="text-align:center">Még nincs saját mesétek. Írjatok egyet a ✍️ gombbal, vagy játsszatok a mesealkotóval! 🌙</p>`)}
+ B.innerHTML=`<div class="row"><button class="chip" data-a="new">🧩 Mesealkotó játék</button><button class="chip" data-a="exp">📤 Mentés fájlba</button><button class="chip" data-a="imp">📥 Betöltés</button></div>`+(m.length?`<p style="text-align:center;font-size:14px;color:var(--sub)">▶ olvasás · ✏️ átnevezés · 📝 szerkesztés · 🗑️ törlés</p>`+m.map(s=>`<div class="li"><span class="e">${s.emoji}</span><b>${esc(s.title)}</b><div class="acts"><button class="round" data-a="read" data-v="${s.id}">▶</button><button class="round" data-a="ren" data-v="${s.id}">✏️</button><button class="round" data-a="ed" data-v="${s.id}">📝</button><button class="round" data-a="del" data-v="${s.id}">🗑️</button></div></div>`).join(""):`<p style="text-align:center">Még nincs saját mesétek. Írjatok egyet a ✍️ gombbal, vagy játsszatok a mesealkotóval! 🌙</p>`)}
 let edEmoji="📖";
 function vEdit(B,id){const isNew=id==="new",s=isNew?{title:"",text:[]}:mine().find(x=>x.id===id);if(!s)return go("list");
  if(isNew)edEmoji="📖";
@@ -190,6 +196,9 @@ function vEdit(B,id){const isNew=id==="new",s=isNew?{title:"",text:[]}:mine().fi
 
 function act(a,v){const f=id=>mine().find(x=>x.id===id);
  switch(a){
+ case"exp":{const m=mine();if(!m.length)return window.toast&&toast("Még nincs mit menteni");
+  const bl=new Blob([JSON.stringify({app:"2mese",v:1,stories:m},null,1)],{type:"application/json"}),l=document.createElement("a");l.href=URL.createObjectURL(bl);l.download="2mese-sajat-mesek.json";document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(l.href),4000);window.toast&&toast("Elmentve a letöltések közé ✓");break}
+ case"imp":Q("impf").click();break;
  case"write":go("edit","new");break;
  case"em":{edEmoji=v;Q("emr").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));break}
  case"new":st={ch:[],se:null,beats:[],paras:[],nm:["",""]};go("chars");break;
