@@ -1,4 +1,4 @@
-const C="mesevar-v24";
+const C="mesevar-v27";
 const F=["./","index.html","stories.js","stories-uj.js","stories-3.js","stories-hosszu.js","stories-hosszu2.js","stories-mazsola.js","stories-sarkany2.js","stories-grimm.js","stories-stilus.js","alkoto.js","qr.js","covers.js","images.js","config.js","manifest.json","icon-192.png","icon-512.png"];
 self.addEventListener("install",e=>{e.waitUntil((async()=>{const c=await caches.open(C);await c.addAll(F);})());self.skipWaiting()});
 self.addEventListener("activate",e=>e.waitUntil((async()=>{for(const k of await caches.keys())if(k!==C)await caches.delete(k);await self.clients.claim()})()));

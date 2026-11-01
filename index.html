@@ -68,6 +68,7 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .end{text-align:center;margin:30px 0 90px}.end .chip{margin:6px;font-size:17px;padding:14px 22px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom));background:#333;color:#fff;padding:12px 20px;border-radius:26px;z-index:20;font-size:15px;opacity:0;pointer-events:none;transition:.3s;max-width:90%;text-align:center}
 .toast.on{opacity:1}#upd.spin{animation:rot .8s linear infinite}@keyframes rot{to{transform:rotate(360deg)}}
+.loader{position:absolute;inset:0;background:var(--bg);display:grid;place-items:center;z-index:2}.loader svg{width:48px;height:48px;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
 body.night .card .img,body.night .hero,body.night .cover{filter:brightness(.62) saturate(.7)}
 body.night #wc{filter:brightness(.72) saturate(.8)}
 body.night .story{line-height:1.9}
@@ -142,8 +143,8 @@ body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
 </main>
 
 <section class="reader" id="reader">
- <div class="top"><button class="chip" id="back">← Vissza</button><span><button class="round" id="fav" title="Kedvenc">🤍</button> <button class="round" id="share">🔗</button> <button class="round" id="fs">Aa</button> <button class="round" id="x">✕</button></span></div>
- <div class="cover" id="cover"></div>
+ <div class="top"><button class="chip" id="back">← Vissza</button><span><button class="round" id="fav" title="Kedvenc">🤍</button> <button class="round" id="share">🔗</button> <button class="round" id="fs">Aa</button> <button class="round" id="regenImg" title="Új kép generálása">🎨</button> <button class="round" id="x">✕</button></span></div>
+ <div class="cover" id="cover"><div class="loader" id="coverLoader" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-dasharray="60" stroke-dashoffset="20"/></svg></div></div>
  <article class="story" id="story"></article>
  <div class="bar"><button class="play" id="play" title="Felolvasás">▶</button><button class="chip" id="gear" style="margin-left:auto">⚙️ Beállítások</button></div>
 </section>
@@ -165,6 +166,7 @@ body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
  <div class="dsec">😴 Alvásidőzítő</div><div class="prow"><button class="chip" id="sl" title="Alvásidőzítő">😴 Ki</button></div>
  <div class="dsec">🌑 Elalváshoz</div><div class="prow"><button class="chip" id="pdark">🌑 Sötét képernyő</button></div>
  <div class="dsec">🌙 Éjszakai mód</div><div class="prow"><button class="chip" id="pnight">Váltás</button></div>
+ <div class="dsec">🎨 AI Képek</div><div class="prow"><button class="chip" id="clearCache" style="background:#e74c3c;color:#fff">🗑️ Összes törlése</button></div>
 </aside>
 <div class="sleepscr" id="sleepscr"><div class="sm">🌙</div><small>Jó éjszakát! Koppints a felébresztéshez.</small></div>
 <div class="toast" id="toast"></div>
@@ -228,20 +230,26 @@ function chips(){drawerCats();$("chips").innerHTML=Object.entries(CATS).map(([k,
  document.querySelectorAll(".chip[data-k]").forEach(b=>b.onclick=()=>{cat=b.dataset.k;chips();list()})}
 function list(){const q=$("q").value.toLowerCase(),L=S.filter(s=>inCat(s,cat)&&s.title.toLowerCase().includes(q));
  $("cnt").textContent=L.length+" mese";tiles();
- $("grid").innerHTML=L.map(s=>{const c=s.cat||"esti",A=ACC[c]||["⭐","🌙"],coverImg=window.CoverGenerator?window.CoverGenerator.generate(s):null;
+ $("grid").innerHTML=L.map(s=>{const c=s.cat||"esti",A=ACC[c]||["⭐","🌙"];
+ const cachedImg=window.ImageGenerator?window.ImageGenerator.getCached(s.id):null;
+ const svgImg=window.CoverGenerator?window.CoverGenerator.generate(s):null;
+ const coverImg=cachedImg||svgImg;
  return `<div class="card" data-id="${s.id}"><div class="img" style="background:${grad(s)};${coverImg?'background-image:url('+coverImg+');background-size:cover;':''}" data-story-id="${s.id}"><span class="acc a1">${A[0]}</span><span class="acc a2">${A[1]}</span><span class="big">${s.emoji}</span><span class="cb">${CI[c]||"📖"}</span>${seen.has(s.id)?'<span class="ck">✓</span>':""}${fav.has(s.id)?'<span class="hf">❤️</span>':""}<span class="mn">⏱ ${s.min} perc</span></div><div class="t">${E(s.title)}<small>${CN[c]||"Mese"}</small></div></div>`}).join("")||`<p style="grid-column:1/-1;text-align:center;color:var(--sub)">Nincs ilyen mese. Próbálj másik szót! 🌙</p>`;
  document.querySelectorAll(".card").forEach(c=>c.onclick=()=>open(c.dataset.id));
- // AI képek betöltése a háttérben
- if(window.ImageGenerator){window.ImageGenerator.preload(L,3)}}
+ // AI képek betöltése a háttérben (csak ha van internet)
+ if(navigator.onLine&&window.ImageGenerator){window.ImageGenerator.preload(L,3)}}
 $("q").oninput=list;
 
 function open(id){stop();cur=S.find(s=>s.id===id);if(!cur)return;markSeen(id);setTimeout(()=>{$("fav").textContent=fav.has(id)?"❤️":"🤍"},0);
  if(history.state&&history.state.r)history.replaceState({r:1},"","#"+id);else history.pushState({r:1},"","#"+id);
- const coverImg=window.CoverGenerator?window.CoverGenerator.generate(cur):null;
+ const cachedImg=window.ImageGenerator?window.ImageGenerator.getCached(cur.id):null;
+ const svgImg=window.CoverGenerator?window.CoverGenerator.generate(cur):null;
+ const coverImg=cachedImg||svgImg;
  $("cover").style.background=grad(cur)+(coverImg?';background-image:url('+coverImg+');background-size:cover;':'');
  $("cover").textContent=cur.emoji;
- // AI kép generálása a háttérben
- if(window.ImageGenerator){window.ImageGenerator.generate(cur).then(img=>{if(img){$("cover").style.backgroundImage=`url(${img})`;toast("🎨 Új illusztráció készült!")}})}
+ $("coverLoader").style.display="none";
+ // AI kép generálása a háttérben (csak ha van internet és nincs cache)
+ if(navigator.onLine&&window.ImageGenerator&&!cachedImg){toast("🎨 Illusztráció generálása...");$("coverLoader").style.display="grid";window.ImageGenerator.generate(cur).then(img=>{if(img){$("cover").style.backgroundImage=`url(${img})`;toast("✨ Új illusztráció készült!");$("coverLoader").style.display="none"}else{$("coverLoader").style.display="none";toast("❌ Generálás sikertelen")}})}
  words=[];let html=`<h2>${E(cur.title)}</h2>`;
  cur.text.forEach(p=>{html+="<p>"+p.split(/\s+/).map(w=>{words.push(w);return `<span class="w">${E(w)}</span>`}).join(" ")+"</p>"});
  html+=`<div class="end"><div style="font-size:48px">🌙</div><button class="chip" id="endBack">✓ Vége – vissza a menübe</button><br><button class="chip" id="endWheel">🎡 Másik mesét pörgetek</button></div>`;
@@ -294,6 +302,7 @@ $("play").onclick=()=>speaking?stop():speak();
 $("rate").onchange=()=>{if(speaking)speak()};$("voice").onchange=()=>{if(speaking)speak()};
 $("fav").onclick=()=>{if(!cur)return;setFav(cur.id);$("fav").textContent=fav.has(cur.id)?"❤️":"🤍";chips();list();toast(fav.has(cur.id)?"Kedvenc ❤️":"Kivéve a kedvencek közül")};
 $("fs").onclick=()=>{fs=fs>=1.4?0.9:fs+0.2;document.documentElement.style.setProperty("--fs",fs)};
+$("regenImg").onclick=()=>{if(!cur||!window.ImageGenerator)return;if(!navigator.onLine){toast("❌ Nincs internet - offline mód");return}toast("🎨 Új kép generálása...");$("coverLoader").style.display="grid";window.ImageGenerator.generate(cur,true).then(img=>{if(img){$("cover").style.backgroundImage=`url(${img})`;toast("✨ Új illusztráció készült!");$("coverLoader").style.display="none"}else{$("coverLoader").style.display="none";toast("❌ Generálás sikertelen")}})};
 
 // Megosztás: link + QR
 function shareText(){const tx=cur.title+"\n\n"+cur.text.join("\n\n");
@@ -377,6 +386,7 @@ $("menuBtn").onclick=()=>dOpen(true);$("dClose").onclick=()=>dOpen(false);$("scr
 $("gear").onclick=()=>pOpen(true);$("pClose").onclick=()=>pOpen(false);$("pnight").onclick=()=>window.toggleNight();
 const setFs=v=>{fs=Math.min(1.7,Math.max(.8,+v.toFixed(2)));document.documentElement.style.setProperty("--fs",fs)};
 $("fsm").onclick=()=>setFs(fs-.15);$("fsp").onclick=()=>setFs(fs+.15);
+$("clearCache").onclick=()=>{if(!window.ImageGenerator)return;if(confirm("Biztosan törlöd az összes generált képet?")){const count=window.ImageGenerator.clearAll();toast(`🗑️ ${count} kép törölve`);list();if(cur){const svgImg=window.CoverGenerator?window.CoverGenerator.generate(cur):null;$("cover").style.backgroundImage=svgImg?`url(${svgImg})`:''}}};
 if(standalone)$("dinst").style.display="none";
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){dOpen(false);pOpen(false)}});
 let tx=0,ty=0;document.addEventListener("touchstart",e=>{const q=e.touches[0];tx=q.clientX;ty=q.clientY},{passive:true});
@@ -394,6 +404,9 @@ $("pdark").onclick=sleepNow;$("sleepscr").onclick=()=>$("sleepscr").classList.re
 setInterval(()=>{if(!document.hidden)checkUpdate(false)},30*60*1000);
 greet();daily();renderLast();chips();list();
 if(location.hash.length>1)open(location.hash.slice(1));
+// Online/offline érzékelés
+window.addEventListener('online',()=>toast("🌐 Internet újra elérhető - AI képek generálhatók"));
+window.addEventListener('offline',()=>toast("📡 Nincs internet - offline mód aktiválva"));
 </script>
 </body>
 </html>
