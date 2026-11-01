@@ -93,9 +93,9 @@ function dat(n){const w=n.trim(),low=w.toLowerCase().split(/\s+/).pop(),vs=[...l
  const nn=[...vs].reverse().find(v=>!"ieéí".includes(v)),back=nn?"aáoóuú".includes(nn):false;let base=w;const end=w.slice(-1);
  if(end==="a"||end==="A")base=w.slice(0,-1)+"á";else if(end==="e"||end==="E")base=w.slice(0,-1)+"é";return base+(back?"nak":"nek")}
 const cleanName=s=>{s=String(s||"").replace(/[^\p{L} '’-]/gu,"").replace(/\s+/g," ").trim().slice(0,20);return s?cap(s):""};
-const ctx=()=>{const [a,b,g]=st.ch.map(chr),[n1,n2]=st.nm||["",""],H=n1||a.n,F=n2||b.n;
- return{H,Hb:n1||a.b,Hd:n1?dat(n1):a.d,F,G:g?g.n:"",S:SE.find(s=>s.id===st.se).in,Hq:cap(H)+" "+QU[a.id],Fq:cap(F)+" "+QU[b.id],sd:SD[st.se]}};
-const spec=()=>{const [a,b]=st.ch.map(chr),[n1,n2]=st.nm||["",""];
+const ctx=()=>{const [a,b,g]=st.ch.map(chr),[n1,n2,n3]=st.nm||[],H=n1||a.n,F=n2||b.n;
+ return{H,Hb:n1||a.b,Hd:n1?dat(n1):a.d,F,G:g?(n3?`${n3}, ${g.n}`:g.n):"",S:SE.find(s=>s.id===st.se).in,Hq:cap(H)+" "+QU[a.id],Fq:cap(F)+" "+QU[b.id],sd:SD[st.se]}};
+const spec=()=>{const [a,b]=st.ch.map(chr),[n1,n2]=st.nm||[];
  if(n1&&n2)return `${n1} ${kind(a)} volt, ${n2} pedig ${kind(b)}.`;if(n1)return `${n1} ${kind(a)} volt.`;if(n2)return `${n2} ${kind(b)} volt.`;return""};
 const intro=()=>{const c=ctx(),sp=spec();return rnd([`Hol volt, hol nem volt, ${c.S} élt ${c.H} és ${c.F}.`,`Egyszer régen ${c.S} lakott ${c.H} és ${c.F}.`,`Mesélik, hogy ${c.S} élt ${c.H} és ${c.F}.`])+" "+(sp?sp+" ":"")+c.sd+" "+rnd(["Jó barátok voltak, és sosem unatkoztak.","Együtt reggeliztek, együtt nevettek, és együtt álmodtak.","Nem volt olyan nap, hogy ne találtak volna ki valami újat."])+" "+c.Hq};
 const outro=()=>{const c=ctx(),H=cap(c.H);return rnd([`A nap lassan lement, és a csillagok egyenként kigyulladtak. ${H} és ${c.F} nagyot ásított. – Holnap folytatjuk – mondta ${c.H}. – Holnap folytatjuk – ismételte ${c.F}, aztán már csak a szuszogásuk hallatszott. Jó éjszakát!`,`Hazafelé már alig bírták nyitva tartani a szemüket. A Hold is álmosan pislogott az égen. ${H} és ${c.F} egymás mellé kuporodtak, és a világ egyszerre nagyon csendes lett. Jó éjszakát!`,`Leszállt az este. Valahol messze egy bagoly huhogott, a szél pedig halkan dúdolt. ${H} és ${c.F} bebújtak a takaró alá. Először ${c.H} aludt el, aztán ${c.F} is. Jó éjszakát!`])};
@@ -133,6 +133,11 @@ body.night .pic{filter:brightness(.7) saturate(.8)}
 .cbar .chip{min-height:52px;font-size:17px;padding:10px 14px;white-space:nowrap}.cbar .chip.big{padding:12px 18px}.cbar .go{margin-left:auto}
 .nm{background:var(--card);border-radius:22px;padding:12px;margin:12px 0}.nmh{display:flex;gap:12px;align-items:center}.nmh .pic{flex:none;width:72px;height:72px;margin:0}.nmh .pic .e{font-size:42px}.nmh b{display:block;margin-bottom:6px}
 .nm .chips2{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.nm .chip{padding:8px 14px}
+.slots{display:flex;gap:10px;margin:6px 0 10px}.slot{flex:1;min-width:0;background:var(--card);border-radius:18px;padding:8px 6px;text-align:center;border:3px solid transparent;cursor:pointer}.slot.act{border-color:var(--pri);background:var(--hl)}.slot .pic{width:56px;height:56px;margin:0 auto 4px}.slot .pic .e{font-size:34px}.slot small{display:block;color:var(--sub);font-size:11px}.slot b{display:block;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ndisp{display:flex;gap:8px;align-items:center;margin:8px 0}.ndisp input{flex:1;min-width:0;font:inherit;font-size:30px;font-weight:800;text-align:center;padding:12px;border-radius:18px;border:3px solid var(--pri);background:var(--card);color:var(--tx)}
+.nch{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:none}.nch .chip{flex:none}
+.kb{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.key{background:var(--card);border-radius:16px;padding:6px 2px;display:flex;flex-direction:column;align-items:center;box-shadow:0 2px 6px #0002;color:var(--tx);min-height:94px}.key b{font-size:26px;line-height:1.1;color:var(--pri)}.key .ke{font-size:30px;line-height:1.15}.key small{font-size:11px;color:var(--sub);line-height:1.1}.key:active{transform:scale(.92);background:var(--hl)}.key.wide{grid-column:span 5;min-height:58px;flex-direction:row;justify-content:center;font-size:20px;font-weight:700}
+@media(min-width:700px){.kb{grid-template-columns:repeat(8,1fr)}.key.wide{grid-column:span 8}.key{min-height:110px}.key b{font-size:30px}.key small{font-size:13px}.ndisp input{font-size:38px}}
 #creator textarea,#creator input.search{width:100%}#creator textarea{min-height:48vh;border-radius:18px;padding:14px;font:inherit;font-size:17px;border:2px solid #0001;background:var(--card);color:var(--tx)}
 @media(min-width:700px){#creator .story{max-width:900px}#creator .cg{grid-template-columns:repeat(4,1fr)!important;gap:16px}.pic{width:104px;height:104px}.pic .e{font-size:62px}.cc b{font-size:18px}.cc small{font-size:14px}.pv{font-size:21px;max-height:40vh}.cbar{max-width:900px;margin:auto}.nmh .pic{width:84px;height:84px}}
 @media(min-width:1000px){#creator .cg{grid-template-columns:repeat(5,1fr)!important}}
@@ -163,7 +168,13 @@ const NAMES=["Pöfi","Bogi","Misi","Lili","Peti","Zsófi","Dóri","Bence","Panni
 const SB=()=>"";
 const BK=`<button class="chip" data-a="back">← Vissza</button>`;
 function bar(h){const b=Q("cbar");b.innerHTML=h;b.style.display=h?"flex":"none"}
-function saveNames(){if(Q("nm0"))st.nm=[cleanName(Q("nm0").value),cleanName(Q("nm1").value)]}
+// Gyerekbillentyűzet: minden betűhöz egy állat vagy mesefigura (l = betű, s = ahogy kimondjuk, e = kép, w = szó)
+const KEYS=[["A","a","🐠","aranyhal"],["Á","á","🫐","áfonya"],["B","bé","🐸","béka"],["C","cé","🐱","cica"],["Cs","csé","🐌","csiga"],["D","dé","🐬","delfin"],["E","e","🐭","egér"],["É","é","🦉","éjbagoly"],["F","ef","🦭","foka"],["G","gé","🦍","gorilla"],["Gy","gyé","🦎","gyík"],["H","há","🦢","hattyú"],["I","i","🐆","irbisz"],["Í","í","🌷","írisz"],["J","jé","🐑","juh"],["K","ká","🐶","kutya"],["L","el","🦥","lajhár"],["M","em","🐿️","mókus"],["N","en","☀️","napocska"],["Ny","nyé","🐰","nyuszi"],["O","o","🦁","oroszlán"],["Ó","ó","🐢","óriásteknős"],["Ö","ö","🐂","ökör"],["Ő","ő","🦌","őz"],["P","pé","🐧","pingvin"],["Q","kú","🐹","quokka"],["R","er","🦊","róka"],["S","es","🦔","sün"],["Sz","esz","🦗","szöcske"],["T","té","🐪","teve"],["Ty","tyé","🐔","tyúk"],["U","u","🐩","uszkár"],["Ú","ú","🐟","úszó hal"],["Ü","ü","☄️","üstökös"],["Ű","ű","🧑‍🚀","űrhajós"],["V","vé","🐦","veréb"],["W","dupla vé","🦘","walabi"],["X","iksz","🎶","xilofon"],["Y","ipszilon","🐃","yak"],["Z","zé","🦓","zebra"],["Zs","zsé","🦒","zsiráf"]];
+let nmAct=0,nmHist=[[],[],[]];
+const ROLE=["Főhős","Barát","Vendég"];
+function updSlot(){const e=document.querySelectorAll("#cBody .slot b");e.forEach((b,k)=>{b.textContent=st.nm[k]||cap(chr(st.ch[k]).b)})}
+function saveNames(){if(Q("nmx"))st.nm[nmAct]=Q("nmx").value;st.nm=[0,1,2].map(k=>cleanName(st.nm[k]||""))}
+function saveNamesOld(){if(Q("nm0"))st.nm=[cleanName(Q("nm0").value),cleanName(Q("nm1").value)]}
 function go(s,arg){step=s;Q("creator").scrollTop=0;render(arg);
  const P={chars:"Válassz két vagy három szereplőt! Ha rákoppintasz, megmondom, ki ő.",names:"Hogy hívják a főhőst? Beírhatod a nevét, vagy választhatsz egyet.",set:"Hol játsszon a mese?"};if(P[s])say(P[s])}
 function goBack(){if(step==="home")return closeCreator();if(step==="names")saveNames();
@@ -173,9 +184,13 @@ function render(arg){const i=FLOW.indexOf(step);Q("cStep").innerHTML=(i>=0?`<sma
 function vHome(B){bar("");B.innerHTML=`<div style="text-align:center"><div style="font-size:64px">🧩</div><h2>Alkossunk mesét együtt!</h2><p>Válasszátok ki a szereplőket, adjatok nekik nevet, és lapokból építsétek fel a történetet.</p><button class="chip big go" data-a="new">✨ Mesealkotó játék</button><br><button class="chip big" data-a="write">✍️ Saját mese írása</button><br><button class="chip big" data-a="list">⭐ Saját meséim (${mine().length})</button></div>`}
 function vChars(B){const sel=st.ch.map(id=>chr(id).e).join(" ");bar(BK+`<button class="chip big go" data-a="cnext" ${st.ch.length<2?"disabled":""}>Tovább →</button>`);
  B.innerHTML=`<div class="pickbar">${sel||"👆 Koppints a képekre!"}</div><p style="text-align:center;font-size:14px;color:var(--sub);margin:0">Három szereplőnél magától továbblépünk. Kettővel a „Tovább" gomb is jó.</p><div class="cg">${CH.map((c,i)=>{const k=st.ch.indexOf(c.id);return `<div class="cc ${k>=0?"sel":""}" data-a="pc" data-v="${c.id}">${k>=0?`<span class="num">${k+1}</span>`:""}${pic(c.id,c.e,i)}<b>${cap(c.b)}</b></div>`}).join("")}</div>`}
-function vNames(B){bar(`<button class="chip" data-a="back">← Vissza</button><button class="chip big go" data-a="nnext">Tovább →</button>`);
- B.innerHTML=`<p style="text-align:center">Írd be a nevüket, vagy koppints egy névre. Nem kötelező, a nevet bármikor kihagyhatod!</p>`+[0,1].map(k=>{const c=chr(st.ch[k]);return `<div class="nm"><div class="nmh">${pic(c.id,c.e,k)}<div style="flex:1"><b>${k?"A barát":"A főhős"}: ${cap(c.b)}</b><input class="search" id="nm${k}" maxlength="20" placeholder="Írd be a nevét…" autocomplete="off" style="margin:0"></div></div><div class="chips2">${NAMES.map(n=>`<button class="chip" data-a="nm" data-v="${k}|${n}">${n}</button>`).join("")}</div></div>`}).join("");
- Q("nm0").value=(st.nm||[])[0]||"";Q("nm1").value=(st.nm||[])[1]||""}
+function vNames(B){bar(BK+`<button class="chip" data-a="nsay" title="Felolvasás">🔊</button><button class="chip big go" data-a="nnext">Tovább →</button>`);
+ B.innerHTML=`<p style="text-align:center;margin:4px 0">Koppints egy szereplőre, aztán a betűkre. Minden betű egy állat vagy mesefigura!</p>
+ <div class="slots">${st.ch.map((id,k)=>{const c=chr(id);return `<div class="slot ${k===nmAct?"act":""}" data-a="slot" data-v="${k}">${pic(c.id,c.e,k)}<small>${ROLE[k]}</small><b>${esc(st.nm[k]||cap(c.b))}</b></div>`}).join("")}</div>
+ <div class="ndisp"><input id="nmx" inputmode="none" maxlength="20" placeholder="Koppints a betűkre…" autocomplete="off"><button class="round" data-a="bs" title="Törlés">⌫</button><button class="round" data-a="kbd" title="Telefon billentyűzete">⌨️</button></div>
+ <div class="nch">${NAMES.map(n=>`<button class="chip" data-a="nm" data-v="${n}">${n}</button>`).join("")}</div>
+ <div class="kb">${KEYS.map((k,i)=>`<button class="key" data-a="key" data-v="${i}"><b>${k[0]}</b><span class="ke">${k[2]}</span><small>${k[3]}</small></button>`).join("")}<button class="key wide" data-a="sp">␣ szóköz</button></div>`;
+ const x=Q("nmx");x.value=st.nm[nmAct]||"";x.oninput=()=>{st.nm[nmAct]=x.value;nmHist[nmAct]=[];updSlot()}}
 function vSet(B){bar(`<button class="chip" data-a="back">← Vissza</button>`);B.innerHTML=`<div class="cg" style="grid-template-columns:repeat(2,1fr)">${SE.map((s,i)=>`<div class="cc" data-a="ps" data-v="${s.id}">${pic(s.id,s.e,i+3)}<b>${s.t}</b></div>`).join("")}</div>`}
 function vPlot(B){const n=st.beats.length;
  bar(BK+(n?`<button class="chip" data-a="undo" title="Az utolsó lap törlése">↩️</button>`:"")+(n<MAXB?`<button class="chip" data-a="shuf" title="Más lapok">🔀</button>`:"")+(n>=MINB?`<button class="chip big go" data-a="finish">🌙 Vége</button>`:""));
@@ -201,13 +216,20 @@ function act(a,v){const f=id=>mine().find(x=>x.id===id);
  case"imp":Q("impf").click();break;
  case"write":go("edit","new");break;
  case"em":{edEmoji=v;Q("emr").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));break}
- case"new":st={ch:[],se:null,beats:[],paras:[],nm:["",""]};go("chars");break;
+ case"new":st={ch:[],se:null,beats:[],paras:[],nm:["","",""]};nmAct=0;go("chars");break;
  case"back":goBack();break;
- case"nm":{const [k,n]=v.split("|");Q("nm"+k).value=n;say("A neve: "+n+".");break}
+ case"slot":{saveNames();nmAct=+v;render();break}
+ case"key":{const k=KEYS[+v];let s=st.nm[nmAct]||"";if(s.length+k[0].length>20)return say("Elég hosszú név!");
+  const up=!s||/[ -]$/.test(s),ch=up?k[0]:k[0].toLowerCase();st.nm[nmAct]=s+ch;nmHist[nmAct].push(ch.length);Q("nmx").value=st.nm[nmAct];updSlot();say(k[1]+", mint "+k[3]+".");break}
+ case"sp":{let s=st.nm[nmAct]||"";if(!s||/ $/.test(s)||s.length>=20)return;st.nm[nmAct]=s+" ";nmHist[nmAct].push(1);Q("nmx").value=st.nm[nmAct];updSlot();break}
+ case"bs":{let s=st.nm[nmAct]||"";if(!s)return;const n=nmHist[nmAct].pop()||1;st.nm[nmAct]=s.slice(0,-n);Q("nmx").value=st.nm[nmAct];updSlot();break}
+ case"kbd":{const x=Q("nmx");x.inputMode=x.inputMode==="none"?"text":"none";x.blur();x.focus();break}
+ case"nm":{st.nm[nmAct]=v;nmHist[nmAct]=[];Q("nmx").value=v;updSlot();say("A neve: "+v+".");break}
+ case"nsay":{saveNames();say(st.ch.map((id,k)=>st.nm[k]||chr(id).b).join(". "));break}
  case"nnext":saveNames();go("set");break;
  case"list":go("list");break;
- case"pc":{const i=st.ch.indexOf(v),c=chr(v);if(i>=0){st.ch.splice(i,1);say("Kivettük: "+c.b+".")}else if(st.ch.length<3){st.ch.push(v);say(cap(c.n)+"! "+["Ő lesz a főhős.","Ő lesz a legjobb barát.","Ő lesz a vendég."][st.ch.length-1])}else say("Legfeljebb három szereplő lehet.");render();if(st.ch.length===3)setTimeout(()=>{if(step==="chars"&&st.ch.length===3){st.nm=st.nm||["",""];go("names")}},1500);break}
- case"cnext":if(st.ch.length>=2){st.nm=st.nm||["",""];go("names")}break;
+ case"pc":{const i=st.ch.indexOf(v),c=chr(v);if(i>=0){st.ch.splice(i,1);say("Kivettük: "+c.b+".")}else if(st.ch.length<3){st.ch.push(v);say(cap(c.n)+"! "+["Ő lesz a főhős.","Ő lesz a legjobb barát.","Ő lesz a vendég."][st.ch.length-1])}else say("Legfeljebb három szereplő lehet.");render();if(st.ch.length===3)setTimeout(()=>{if(step==="chars"&&st.ch.length===3){st.nm=st.nm||["","",""];nmAct=0;go("names")}},1500);break}
+ case"cnext":if(st.ch.length>=2){st.nm=st.nm||["","",""];nmAct=0;go("names")}break;
  case"ps":{const s=SE.find(x=>x.id===v);st.se=v;st.beats=[];st.paras=[intro()];dealCards();go("plot");say(s.t+"! A mese "+s.in+" játszódik. "+st.paras[0]);break}
  case"pb":{const b=BT.find(x=>x.id===v);let p=cap(rnd(b.x)(ctx()).replace(/([.!?]) ([a-zöüóőúéáűí])/g,(m,x,y)=>x+" "+y.toUpperCase()));if(st.beats.length&&Math.random()<.6)p=rnd(CONN)+" "+p;st.beats.push(v);st.paras.push(p);dealCards();render();say(b.t+"! "+p);if(st.beats.length>=MAXB)setTimeout(()=>{if(step==="plot"&&st.beats.length>=MAXB&&st.paras.length===MAXB+1){st.paras.push(outro());go("fin")}},3500);break}
  case"shuf":dealCards();render();break;
