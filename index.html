@@ -11,52 +11,52 @@
 <link rel="icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-title" content="2mese és alvás">
 <style>
-:root{--bg:#fff7ec;--card:#fff;--tx:#3b2f2f;--sub:#8a7a7a;--pri:#ff8a5c;--green:#2e9e4f;--hl:#e6f7ea}
-body.night{--bg:#16120f;--card:#231c16;--tx:#f0dcc0;--sub:#a8927a;--pri:#e0894a;--green:#9bd17a;--hl:#2d2a1c;color-scheme:dark}
+:root{--bg:#faf4f0;--card:#fff;--tx:#2d2a2a;--sub:#7a6a6a;--pri:#ff6b6b;--green:#4ade80;--hl:#dcfce7;--glass:rgba(255,255,255,0.7);--shadow:0 4px 20px rgba(0,0,0,0.08);--shadow-hover:0 8px 30px rgba(0,0,0,0.12)}
+body.night{--bg:#1a1512;--card:#251e18;--tx:#f0e8e0;--sub:#9a8a7a;--pri:#ff8787;--green:#86efac;--hl:#1f2937;color-scheme:dark;--glass:rgba(37,30,24,0.8);--shadow:0 4px 20px rgba(0,0,0,0.3);--shadow-hover:0 8px 30px rgba(0,0,0,0.4)}
 *{box-sizing:border-box}
-body{margin:0;font-family:"Nunito","Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--tx);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);transition:.3s}
-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px}
-h1{margin:0;font-size:24px}
-button{font:inherit;cursor:pointer;border:0}
-.round{width:46px;height:46px;border-radius:50%;background:var(--card);font-size:22px;box-shadow:0 3px 10px #0002}
+body{margin:0;font-family:"Nunito","Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--tx);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);transition:background .3s,color .3s}
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:var(--glass);backdrop-filter:blur(10px);position:sticky;top:0;z-index:2}
+h1{margin:0;font-size:24px;font-weight:800;background:linear-gradient(135deg,var(--pri),#ffa07a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+button{font:inherit;cursor:pointer;border:0;transition:transform .2s,box-shadow .2s}
+button:active{transform:scale(0.95)}
+.round{width:52px;height:52px;border-radius:50%;background:var(--card);font-size:24px;box-shadow:var(--shadow);transition:all .3s}.round:hover{box-shadow:var(--shadow-hover);transform:translateY(-2px)}
 main{padding:0 16px 90px;max-width:760px;margin:auto}
-.search{width:100%;padding:14px 18px;border-radius:30px;border:2px solid #0001;background:var(--card);color:var(--tx);font:inherit;margin-bottom:14px}
-.hero{border-radius:28px;padding:22px;color:#fff;display:flex;gap:16px;align-items:center;margin-bottom:16px;box-shadow:0 6px 18px #0003;cursor:pointer}
-.hero .e{font-size:64px}.hero small{opacity:.9}.hero b{font-size:20px;display:block}
-.chips{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px}
-.chip{padding:10px 18px;border-radius:30px;background:var(--card);color:var(--tx);white-space:nowrap;box-shadow:0 2px 6px #0002}
-.chip.on{background:var(--pri);color:#fff}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
-.card{border-radius:24px;overflow:hidden;background:var(--card);box-shadow:0 4px 12px #0002;cursor:pointer}
-.card .img{height:110px;display:grid;place-items:center;font-size:56px}
-.card .t{padding:10px 12px 14px;font-weight:700;font-size:15px}.card .t small{display:block;color:var(--sub);font-weight:400}
+.search{width:100%;padding:16px 20px;border-radius:32px;border:2px solid #0001;background:var(--card);color:var(--tx);font:inherit;margin-bottom:16px;box-shadow:var(--shadow);transition:all .3s}.search:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 4px rgba(255,107,107,0.1)}
+.hero{border-radius:32px;padding:24px;color:#fff;display:flex;gap:18px;align-items:center;margin-bottom:20px;box-shadow:var(--shadow);cursor:pointer;transition:all .3s;position:relative;overflow:hidden}.hero:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover)}.hero::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.1),transparent);pointer-events:none}
+.hero .e{font-size:72px;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.2))}.hero small{opacity:.95}.hero b{font-size:22px;display:block;font-weight:700}
+.chips{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px;margin-bottom:12px}
+.chip{padding:12px 20px;border-radius:32px;background:var(--card);color:var(--tx);white-space:nowrap;box-shadow:var(--shadow);transition:all .3s;font-weight:600}.chip:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover)}.chip.on{background:linear-gradient(135deg,var(--pri),#ff8787);color:#fff;box-shadow:0 4px 15px rgba(255,107,107,0.4)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}
+.card{border-radius:28px;overflow:hidden;background:var(--card);box-shadow:var(--shadow);cursor:pointer;transition:all .3s;position:relative}.card:hover{transform:translateY(-6px);box-shadow:var(--shadow-hover)}.card:active{transform:translateY(-2px)}
+.card .img{height:130px;display:grid;place-items:center;font-size:64px;position:relative;background-size:cover;background-position:center}.card .img::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 60%,rgba(0,0,0,0.1))}
+.card .t{padding:12px 14px 16px;font-weight:700;font-size:16px}.card .t small{display:block;color:var(--sub);font-weight:500;margin-top:4px}
 .reader{position:fixed;inset:0;background:var(--bg);overflow:auto;padding:env(safe-area-inset-top) 0 120px;display:none}
 .reader.open{display:block}
-.cover{height:200px;display:grid;place-items:center;font-size:96px;border-radius:0 0 40px 40px}
-.story{max-width:700px;margin:auto;padding:18px;font-size:calc(21px * var(--fs,1));line-height:1.75}
-.story h2{font-size:26px}
-.w{border-radius:6px;padding:0 1px;transition:color .2s}
+.cover{height:220px;display:grid;place-items:center;font-size:110px;border-radius:0 0 48px 48px;position:relative;overflow:hidden}.cover::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 70%,rgba(0,0,0,0.15));pointer-events:none}
+.story{max-width:720px;margin:auto;padding:24px;font-size:calc(22px * var(--fs,1));line-height:1.8}
+.story h2{font-size:28px;font-weight:800;margin-bottom:24px;background:linear-gradient(135deg,var(--tx),var(--sub));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.w{border-radius:8px;padding:0 2px;transition:color .2s,background .2s}
 .w.r{color:var(--green);font-weight:700}
-.w.now{background:var(--hl)}
-.bar{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));max-width:700px;margin:auto;background:var(--card);border-radius:36px;box-shadow:0 6px 24px #0004;display:flex;align-items:center;gap:8px;padding:10px 14px}
-.play{width:56px;height:56px;border-radius:50%;background:var(--pri);color:#fff;font-size:24px}
+.w.now{background:var(--hl);border-radius:6px;padding:2px 4px}
+.bar{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));max-width:720px;margin:auto;background:var(--glass);backdrop-filter:blur(10px);border-radius:40px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;padding:12px 16px;border:1px solid rgba(255,255,255,0.1)}
+.play{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--pri),#ff8787);color:#fff;font-size:26px;box-shadow:0 4px 15px rgba(255,107,107,0.4);transition:all .3s}.play:hover{transform:scale(1.05);box-shadow:0 6px 20px rgba(255,107,107,0.5)}.play:active{transform:scale(0.95)}
 .bar select,.bar input{flex:1;min-width:0}
 .top{position:fixed;top:calc(10px + env(safe-area-inset-top));left:12px;right:12px;display:flex;justify-content:space-between;z-index:3}
-.modal{position:fixed;inset:0;background:#0008;display:none;place-items:center;z-index:9}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);display:none;place-items:center;z-index:9}
 .modal.open{display:grid}
-.box{background:var(--card);border-radius:28px;padding:24px;text-align:center;max-width:300px}
-#qr{display:grid;place-items:center;background:#fff;padding:12px;border-radius:16px;margin:12px 0}
+.box{background:var(--card);border-radius:32px;padding:28px;text-align:center;max-width:340px;box-shadow:var(--shadow-hover);border:1px solid rgba(255,255,255,0.1)}
+#qr{display:grid;place-items:center;background:#fff;padding:16px;border-radius:20px;margin:16px 0;box-shadow:var(--shadow)}
 html,body{overscroll-behavior:none}
 body.lock{overflow:hidden}
-.reader{height:100dvh;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-top:calc(64px + env(safe-area-inset-top))}
+.reader{height:100dvh;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-top:calc(72px + env(safe-area-inset-top))}
 .chips{overscroll-behavior-x:contain;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
-.wrap{position:relative;width:300px;max-width:100%;margin:10px auto}
-.wrap canvas{width:100%;height:auto;display:block}
-.ptr{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:34px;color:#e53935;z-index:2;filter:drop-shadow(0 2px 2px #0006)}
-#wres{min-height:92px;margin:6px 0 10px;font-weight:700}
-#wres .e{font-size:48px;animation:pop .5s}
+.wrap{position:relative;width:320px;max-width:100%;margin:12px auto}
+.wrap canvas{width:100%;height:auto;display:block;border-radius:20px}
+.ptr{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:36px;color:#e53935;z-index:2;filter:drop-shadow(0 3px 4px rgba(0,0,0,0.3))}
+#wres{min-height:100px;margin:8px 0 12px;font-weight:700}
+#wres .e{font-size:52px;animation:pop .5s}
 @keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
-.card{contain:layout paint;content-visibility:auto;contain-intrinsic-size:150px 190px;-webkit-tap-highlight-color:transparent}
+.card{contain:layout paint;content-visibility:auto;contain-intrinsic-size:160px 200px;-webkit-tap-highlight-color:transparent}
 .reader,.chips{will-change:scroll-position}
 #wc{will-change:transform;transform:translateZ(0)}
 button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
@@ -130,7 +130,7 @@ body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
 </style>
 </head>
 <body>
-<header><div style="display:flex;align-items:center;gap:12px"><button class="round" id="menuBtn" title="Menü">☰</button><img src="icon-192.png" alt="" width="46" height="46" style="border-radius:14px;box-shadow:0 3px 10px #0004"><div><h1>2mese és alvás</h1><small style="color:var(--sub)">Esti mesék 3–6 éveseknek</small></div></div><button class="round" id="upd" title="Frissítés">🔄</button></header>
+<header><div style="display:flex;align-items:center;gap:12px"><button class="round" id="menuBtn" title="Menü">☰</button><img src="icon-192.png" alt="" width="46" height="46" style="border-radius:14px;box-shadow:0 3px 10px #0004"><div><h1>2mese és alvás</h1><small style="color:var(--sub)">Esti mesék 3–6 éveseknek · v<span id="verNum">--</span></small></div></div><button class="round" id="upd" title="Frissítés"><span id="updIcon">🔄</span><span id="updPct" style="display:none;font-size:12px">0%</span></button></header>
 <main>
  <div class="greet" id="greet"></div>
  <div class="hero" id="daily"></div>
@@ -249,7 +249,8 @@ function open(id){stop();cur=S.find(s=>s.id===id);if(!cur)return;markSeen(id);se
  $("cover").textContent=cur.emoji;
  $("coverLoader").style.display="none";
  // AI kép generálása a háttérben (csak ha van internet és nincs cache)
- if(navigator.onLine&&window.ImageGenerator&&!coverImg.startsWith('data:image/svg')){try{toast("🎨 Illusztráció generálása...");$("coverLoader").style.display="grid";window.ImageGenerator.generate(cur).then(img=>{if(img){$("cover").style.backgroundImage=`url(${img})`;toast("✨ Új illusztráció készült!");$("coverLoader").style.display="none"}else{$("coverLoader").style.display="none";toast("❌ Generálás sikertelen")}})}catch(e){console.error('Image generation error:',e);$("coverLoader").style.display="none";toast("❌ Generálási hiba")}}
+ const isSvg=coverImg&&coverImg.startsWith('data:image/svg');
+ if(navigator.onLine&&window.ImageGenerator&&!isSvg){try{toast("🎨 Illusztráció generálása...");$("coverLoader").style.display="grid";window.ImageGenerator.generate(cur).then(img=>{if(img){$("cover").style.backgroundImage=`url(${img})`;toast("✨ Új illusztráció készült!");$("coverLoader").style.display="none"}else{$("coverLoader").style.display="none";toast("❌ Generálás sikertelen")}})}catch(e){console.error('Image generation error:',e);$("coverLoader").style.display="none";toast("❌ Generálási hiba")}}
  words=[];let html=`<h2>${E(cur.title)}</h2>`;
  cur.text.forEach(p=>{html+="<p>"+p.split(/\s+/).map(w=>{words.push(w);return `<span class="w">${E(w)}</span>`}).join(" ")+"</p>"});
  html+=`<div class="end"><div style="font-size:48px">🌙</div><button class="chip" id="endBack">✓ Vége – vissza a menübe</button><br><button class="chip" id="endWheel">🎡 Másik mesét pörgetek</button></div>`;
@@ -349,14 +350,16 @@ document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>({
 function toast(m){const e=$("toast");e.textContent=m;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),3200)}
 async function hardRefresh(){try{for(const k of await caches.keys())await caches.delete(k);const r=await navigator.serviceWorker.getRegistration();r&&await r.update()}catch(e){}location.reload()}
 async function checkUpdate(manual){
- if(manual)$("upd").classList.add("spin");
+ if(manual){$("upd").classList.add("spin");$("updIcon").style.display="none";$("updPct").style.display="inline";$("updPct").textContent="0%"}
  try{const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw 0;const j=await r.json(),v=String(j.v),old=localStorage.getItem("mv");
   localStorage.setItem("mv",v);
+  if(manual){$("updPct").textContent="100%";setTimeout(()=>{$("upd").classList.remove("spin");$("updIcon").style.display="inline";$("updPct").style.display="none"},500)}
   if(manual||(old!==null&&old!==v)){
    if(!manual&&$("reader").classList.contains("open")){window.pendingUpdate=true;toast("Új mesék érkeztek – a mese végén frissítek ✨");return}
    toast("Frissítés…");setTimeout(hardRefresh,500);return}
- }catch(e){if(manual)toast("Nincs internet – az offline változat fut")}
- $("upd").classList.remove("spin")}
+  if(manual)toast("✓ Nincs új verzió")
+ }catch(e){if(manual){toast("❌ Nincs internet");$("upd").classList.remove("spin");$("updIcon").style.display="inline";$("updPct").style.display="none"}}
+}
 $("upd").onclick=()=>checkUpdate(true);
 // Telepítés (Android: natív kérés, iOS: útmutató)
 let dip=null;const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone;
@@ -404,6 +407,8 @@ $("pdark").onclick=sleepNow;$("sleepscr").onclick=()=>$("sleepscr").classList.re
 setInterval(()=>{if(!document.hidden)checkUpdate(false)},30*60*1000);
 greet();daily();renderLast();chips();list();
 if(location.hash.length>1)open(location.hash.slice(1));
+// Verziószám megjelenítése
+fetch("version.json",{cache:"no-store"}).then(r=>r.json()).then(j=>{$("verNum").textContent=j.v}).catch(()=>{});
 // Online/offline érzékelés
 window.addEventListener('online',()=>toast("🌐 Internet újra elérhető - AI képek generálhatók"));
 window.addEventListener('offline',()=>toast("📡 Nincs internet - offline mód aktiválva"));
