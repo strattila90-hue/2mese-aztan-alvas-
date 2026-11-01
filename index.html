@@ -177,6 +177,7 @@ body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
  <div id="wres"></div>
  <button class="play" id="spin" style="width:auto;padding:0 28px;border-radius:30px">Pörgess!</button>
  <button class="chip" id="wclose" style="margin-left:6px">Bezár</button></div></div>
+<script src="config.js"></script>
 <script src="qr.js"></script>
 <script src="stories.js"></script>
 <script src="stories-uj.js"></script>
@@ -189,6 +190,7 @@ body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
 <script src="stories-stilus.js"></script>
 <script src="alkoto.js"></script>
 <script src="covers.js"></script>
+<script src="images.js"></script>
 <script>
 const S=window.STORIES,$=id=>document.getElementById(id);
 const E=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
@@ -227,8 +229,10 @@ function chips(){drawerCats();$("chips").innerHTML=Object.entries(CATS).map(([k,
 function list(){const q=$("q").value.toLowerCase(),L=S.filter(s=>inCat(s,cat)&&s.title.toLowerCase().includes(q));
  $("cnt").textContent=L.length+" mese";tiles();
  $("grid").innerHTML=L.map(s=>{const c=s.cat||"esti",A=ACC[c]||["⭐","🌙"],coverImg=window.CoverGenerator?window.CoverGenerator.generate(s):null;
- return `<div class="card" data-id="${s.id}"><div class="img" style="background:${grad(s)};${coverImg?'background-image:url('+coverImg+');background-size:cover;':''}"><span class="acc a1">${A[0]}</span><span class="acc a2">${A[1]}</span><span class="big">${s.emoji}</span><span class="cb">${CI[c]||"📖"}</span>${seen.has(s.id)?'<span class="ck">✓</span>':""}${fav.has(s.id)?'<span class="hf">❤️</span>':""}<span class="mn">⏱ ${s.min} perc</span></div><div class="t">${E(s.title)}<small>${CN[c]||"Mese"}</small></div></div>`}).join("")||`<p style="grid-column:1/-1;text-align:center;color:var(--sub)">Nincs ilyen mese. Próbálj másik szót! 🌙</p>`;
- document.querySelectorAll(".card").forEach(c=>c.onclick=()=>open(c.dataset.id))}
+ return `<div class="card" data-id="${s.id}"><div class="img" style="background:${grad(s)};${coverImg?'background-image:url('+coverImg+');background-size:cover;':''}" data-story-id="${s.id}"><span class="acc a1">${A[0]}</span><span class="acc a2">${A[1]}</span><span class="big">${s.emoji}</span><span class="cb">${CI[c]||"📖"}</span>${seen.has(s.id)?'<span class="ck">✓</span>':""}${fav.has(s.id)?'<span class="hf">❤️</span>':""}<span class="mn">⏱ ${s.min} perc</span></div><div class="t">${E(s.title)}<small>${CN[c]||"Mese"}</small></div></div>`}).join("")||`<p style="grid-column:1/-1;text-align:center;color:var(--sub)">Nincs ilyen mese. Próbálj másik szót! 🌙</p>`;
+ document.querySelectorAll(".card").forEach(c=>c.onclick=()=>open(c.dataset.id));
+ // AI képek betöltése a háttérben
+ if(window.ImageGenerator){window.ImageGenerator.preload(L,3)}}
 $("q").oninput=list;
 
 function open(id){stop();cur=S.find(s=>s.id===id);if(!cur)return;markSeen(id);setTimeout(()=>{$("fav").textContent=fav.has(id)?"❤️":"🤍"},0);
@@ -236,6 +240,8 @@ function open(id){stop();cur=S.find(s=>s.id===id);if(!cur)return;markSeen(id);se
  const coverImg=window.CoverGenerator?window.CoverGenerator.generate(cur):null;
  $("cover").style.background=grad(cur)+(coverImg?';background-image:url('+coverImg+');background-size:cover;':'');
  $("cover").textContent=cur.emoji;
+ // AI kép generálása a háttérben
+ if(window.ImageGenerator){window.ImageGenerator.generate(cur).then(img=>{if(img){$("cover").style.backgroundImage=`url(${img})`;toast("🎨 Új illusztráció készült!")}})}
  words=[];let html=`<h2>${E(cur.title)}</h2>`;
  cur.text.forEach(p=>{html+="<p>"+p.split(/\s+/).map(w=>{words.push(w);return `<span class="w">${E(w)}</span>`}).join(" ")+"</p>"});
  html+=`<div class="end"><div style="font-size:48px">🌙</div><button class="chip" id="endBack">✓ Vége – vissza a menübe</button><br><button class="chip" id="endWheel">🎡 Másik mesét pörgetek</button></div>`;
