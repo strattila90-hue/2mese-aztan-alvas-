@@ -231,25 +231,25 @@ function chips(){drawerCats();$("chips").innerHTML=Object.entries(CATS).map(([k,
 function list(){const q=$("q").value.toLowerCase(),L=S.filter(s=>inCat(s,cat)&&s.title.toLowerCase().includes(q));
  $("cnt").textContent=L.length+" mese";tiles();
  $("grid").innerHTML=L.map(s=>{const c=s.cat||"esti",A=ACC[c]||["⭐","🌙"];
- const cachedImg=window.ImageGenerator?window.ImageGenerator.getCached(s.id):null;
- const svgImg=window.CoverGenerator?window.CoverGenerator.generate(s):null;
- const coverImg=cachedImg||svgImg;
+ let coverImg=null;
+ try{if(window.ImageGenerator){const cached=window.ImageGenerator.getCached(s.id);if(cached)coverImg=cached}
+ if(!coverImg&&window.CoverGenerator){coverImg=window.CoverGenerator.generate(s)}}catch(e){console.warn('Cover generation error:',e)}
  return `<div class="card" data-id="${s.id}"><div class="img" style="background:${grad(s)};${coverImg?'background-image:url('+coverImg+');background-size:cover;':''}" data-story-id="${s.id}"><span class="acc a1">${A[0]}</span><span class="acc a2">${A[1]}</span><span class="big">${s.emoji}</span><span class="cb">${CI[c]||"📖"}</span>${seen.has(s.id)?'<span class="ck">✓</span>':""}${fav.has(s.id)?'<span class="hf">❤️</span>':""}<span class="mn">⏱ ${s.min} perc</span></div><div class="t">${E(s.title)}<small>${CN[c]||"Mese"}</small></div></div>`}).join("")||`<p style="grid-column:1/-1;text-align:center;color:var(--sub)">Nincs ilyen mese. Próbálj másik szót! 🌙</p>`;
- document.querySelectorAll(".card").forEach(c=>c.onclick=()=>open(c.dataset.id));
+ document.querySelectorAll(".card").forEach(c=>c.onclick=()=>{try{open(c.dataset.id)}catch(e){console.error('Open error:',e);toast('❌ Hiba a mese megnyitásakor')}});
  // AI képek betöltése a háttérben (csak ha van internet)
- if(navigator.onLine&&window.ImageGenerator){window.ImageGenerator.preload(L,3)}}
+ if(navigator.onLine&&window.ImageGenerator){try{window.ImageGenerator.preload(L,3)}catch(e){console.warn('Preload error:',e)}}}
 $("q").oninput=list;
 
 function open(id){stop();cur=S.find(s=>s.id===id);if(!cur)return;markSeen(id);setTimeout(()=>{$("fav").textContent=fav.has(id)?"❤️":"🤍"},0);
  if(history.state&&history.state.r)history.replaceState({r:1},"","#"+id);else history.pushState({r:1},"","#"+id);
- const cachedImg=window.ImageGenerator?window.ImageGenerator.getCached(cur.id):null;
- const svgImg=window.CoverGenerator?window.CoverGenerator.generate(cur):null;
- const coverImg=cachedImg||svgImg;
+ let coverImg=null;
+ try{if(window.ImageGenerator){const cached=window.ImageGenerator.getCached(cur.id);if(cached)coverImg=cached}
+ if(!coverImg&&window.CoverGenerator){coverImg=window.CoverGenerator.generate(cur)}}catch(e){console.warn('Cover generation error:',e)}
  $("cover").style.background=grad(cur)+(coverImg?';background-image:url('+coverImg+');background-size:cover;':'');
  $("cover").textContent=cur.emoji;
  $("coverLoader").style.display="none";
  // AI kép generálása a háttérben (csak ha van internet és nincs cache)
- if(navigator.onLine&&window.ImageGenerator&&!cachedImg){toast("🎨 Illusztráció generálása...");$("coverLoader").style.display="grid";window.ImageGenerator.generate(cur).then(img=>{if(img){$("cover").style.backgroundImage=`url(${img})`;toast("✨ Új illusztráció készült!");$("coverLoader").style.display="none"}else{$("coverLoader").style.display="none";toast("❌ Generálás sikertelen")}})}
+ if(navigator.onLine&&window.ImageGenerator&&!coverImg.startsWith('data:image/svg')){try{toast("🎨 Illusztráció generálása...");$("coverLoader").style.display="grid";window.ImageGenerator.generate(cur).then(img=>{if(img){$("cover").style.backgroundImage=`url(${img})`;toast("✨ Új illusztráció készült!");$("coverLoader").style.display="none"}else{$("coverLoader").style.display="none";toast("❌ Generálás sikertelen")}})}catch(e){console.error('Image generation error:',e);$("coverLoader").style.display="none";toast("❌ Generálási hiba")}}
  words=[];let html=`<h2>${E(cur.title)}</h2>`;
  cur.text.forEach(p=>{html+="<p>"+p.split(/\s+/).map(w=>{words.push(w);return `<span class="w">${E(w)}</span>`}).join(" ")+"</p>"});
  html+=`<div class="end"><div style="font-size:48px">🌙</div><button class="chip" id="endBack">✓ Vége – vissza a menübe</button><br><button class="chip" id="endWheel">🎡 Másik mesét pörgetek</button></div>`;
