@@ -109,7 +109,7 @@ body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
 .prow{display:flex;gap:10px;align-items:center;padding:0 6px}.panel .chip{min-height:54px;font-size:19px;flex:1}
 .panel select{width:100%;padding:14px;border-radius:16px;font:inherit;font-size:17px;background:var(--bg);color:var(--tx);border:2px solid #0002}.panel input[type=range]{width:100%;height:40px;accent-color:var(--pri)}
 @media(min-width:700px){
- main{max-width:1100px}.tiles{grid-template-columns:repeat(4,1fr)}.tile{min-height:130px}.tile b{font-size:19px}
+ main{max-width:1100px}.tiles{grid-template-columns:repeat(3,1fr)}.tile{min-height:130px}.tile b{font-size:19px}
  .grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px}.card .img{height:150px}.card .big{font-size:78px}.card .t{font-size:17px}
  .hero{min-height:190px}.hero .e{font-size:100px}.hero .ht b{font-size:29px}.pill{font-size:17px!important}
  .greet b{font-size:28px}.search{font-size:18px;padding:16px 22px}.chip{font-size:17px;padding:12px 22px}
@@ -127,6 +127,9 @@ body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
  #reader .story{margin:0 0 0 30vw;max-width:none;padding:76px 56px 150px;font-size:calc(27px*var(--fs,1))}
  .bar{left:calc(var(--sb) + 30vw + 24px);right:24px;max-width:none}
 }
+.stp{display:flex;gap:12px;align-items:center;text-align:left;margin:10px 0}.stp i{flex:none;width:44px;height:44px;border-radius:50%;background:var(--pri);color:#fff;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:20px}.stp span{font-size:17px;line-height:1.35}
+.insarrow{position:fixed;z-index:12;text-align:center;font-size:46px;pointer-events:none;animation:bob 1.1s ease-in-out infinite}.insarrow small{display:block;font-size:13px;color:#fff;font-weight:800;text-shadow:0 1px 5px #000}.insarrow.bt{bottom:calc(4px + env(safe-area-inset-bottom));left:50%;margin-left:-45px;width:90px}.insarrow.tr{top:4px;right:16px}
+@keyframes bob{50%{translate:0 -10px}}
 </style>
 </head>
 <body>
@@ -150,11 +153,12 @@ body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
 </section>
 
 <div class="install" id="install"><img src="icon-192.png" width="44" height="44" style="border-radius:12px" alt=""><div><b>Telepítsd: 2mese és alvás</b><small id="instText">Offline is működik, ikon a kezdőképernyőn</small></div><button class="chip" id="instBtn">Telepítés</button><button class="x" id="instX">✕</button></div>
-<div class="modal" id="iosm"><div class="box"><b>📲 Telepítés iPhone-on</b><p style="text-align:left;line-height:1.8">1. Nyisd meg <b>Safariban</b><br>2. Koppints a <b>Megosztás</b> ⬆️ gombra (alul)<br>3. Görgess le: <b>Főképernyőhöz adás</b><br>4. Koppints: <b>Hozzáadás</b><br><br>✨ Így offline is működik!</p><button class="chip" id="iosx">Rendben</button></div></div>
+<div class="modal" id="insth"><div class="box" style="max-width:380px"><div id="ith"></div><div style="margin-top:12px"><button class="chip" id="ithCopy">🔗 Link másolása</button> <button class="chip" id="ithX">Rendben</button></div></div></div>
+<div class="insarrow bt" id="insArrow" style="display:none">⬇️<small>Megosztás gomb</small></div>
 <div class="scrim" id="scrim"></div>
 <aside class="drawer" id="drawer"><div class="dh"><img src="icon-192.png" alt=""><b>2mese és alvás</b><button class="round" id="dClose" title="Bezár">✕</button></div>
  <div class="dsec">Menü</div>
- <button class="dbtn" data-d="home"><span>🏠 Főoldal</span></button><button class="dbtn" data-d="mk"><span>🧩 Mesealkotó</span></button><button class="dbtn" data-d="wheel"><span>🎡 Szerencsekerék</span></button><button class="dbtn" data-d="own"><span>⭐ Saját meséim</span></button>
+ <button class="dbtn" data-d="home"><span>🏠 Főoldal</span></button><button class="dbtn" data-d="rutin"><span>🛁 Esti rutin</span></button><button class="dbtn" data-d="album"><span>🏅 Matricáim</span></button><button class="dbtn" data-d="mk"><span>🧩 Mesealkotó</span></button><button class="dbtn" data-d="wheel"><span>🎡 Szerencsekerék</span></button><button class="dbtn" data-d="own"><span>⭐ Saját meséim</span></button>
  <div class="dsec">Kategóriák</div><div id="dcats"></div>
  <div class="dsec">Beállítások</div>
  <button class="dbtn" data-d="night"><span>🌙 Éjszakai mód</span><b class="sw" id="dnight"></b></button><button class="dbtn" data-d="upd"><span>🔄 Frissítés</span></button><button class="dbtn" data-d="inst" id="dinst"><span>📲 Telepítés</span></button><button class="dbtn" data-d="share"><span>🔗 App megosztása</span></button>
@@ -164,6 +168,7 @@ body.night .tile,body.night .last .le{filter:brightness(.65) saturate(.75)}
  <div class="dsec">🐢 Sebesség 🐇</div><div class="prow"><input type="range" id="rate" min="0.6" max="1.2" step="0.05" value="0.85" title="Sebesség"></div>
  <div class="dsec">🔠 Betűméret</div><div class="prow"><button class="chip" id="fsm">A−</button><button class="chip" id="fsp">A+</button></div>
  <div class="dsec">😴 Alvásidőzítő</div><div class="prow"><button class="chip" id="sl" title="Alvásidőzítő">😴 Ki</button></div>
+ <div class="dsec">🌧️ Altató hang</div><div class="ambui"></div>
  <div class="dsec">🌑 Elalváshoz</div><div class="prow"><button class="chip" id="pdark">🌑 Sötét képernyő</button></div>
  <div class="dsec">🌙 Éjszakai mód</div><div class="prow"><button class="chip" id="pnight">Váltás</button></div>
  <div class="dsec">🎨 AI Képek</div><div class="prow"><button class="chip" id="clearCache" style="background:#e74c3c;color:#fff">🗑️ Összes törlése</button></div>
@@ -224,9 +229,9 @@ function renderLast(){let s=null;try{s=S.find(x=>x.id===localStorage.lastS)}catc
  $("last").innerHTML=s?`<div class="last" id="lastc"><span class="le" style="background:${grad(s)}">${s.emoji}</span><div><small>🔁 Legutóbb hallgattátok</small><b>${E(s.title)}</b></div><span style="font-size:22px">▶</span></div>`:"";
  if(s)$("lastc").onclick=()=>open(s.id)}
 function tiles(){const n=S.filter(x=>x.custom).length;
- const T=[["wheel","🎡","Szerencsekerék","Pörgess egy mesét!","#f093fb,#f5576c"],["mk","🧩","Mesealkotó","Alkossatok együtt!","#4facfe,#0090d8"],["esti","🌙","Altatómesék","Rövid és álmos","#5f2c82,#49a09d"],["own","⭐","Saját meséim",n?n+" mese · írj még!":"Írj egyet!","#f7971e,#e8a400"]];
+ const T=[["wheel","🎡","Szerencsekerék","Pörgess egy mesét!","#f093fb,#f5576c"],["mk","🧩","Mesealkotó","Alkossatok együtt!","#4facfe,#0090d8"],["esti","🌙","Altatómesék","Rövid és álmos","#5f2c82,#49a09d"],["rutin","🛁","Esti rutin","Lépésről lépésre","#43cea2,#185a9d"],["album","🏅","Matricáim",(window.albumInfo?albumInfo().got+" / "+albumInfo().total+" gyűjtve":"Gyűjtsd össze!"),"#f6d365,#e8943a"],["own","⭐","Saját meséim",n?n+" mese · írj még!":"Írj egyet!","#f7971e,#e8a400"]];
  $("tiles").innerHTML=T.map(t=>`<button class="tile" data-t="${t[0]}" style="background:linear-gradient(135deg,${t[4]})"><span class="ti">${t[1]}</span><b>${t[2]}</b><small>${t[3]}</small></button>`).join("");
- document.querySelectorAll(".tile").forEach(b=>b.onclick=()=>{const k=b.dataset.t;if(k==="wheel")openWheel();else if(k==="mk")openCreator();else if(k==="own")openMine();else{cat=k;chips();list();$("chips").scrollIntoView({behavior:"smooth",block:"start"})}})}
+ document.querySelectorAll(".tile").forEach(b=>b.onclick=()=>{const k=b.dataset.t;if(k==="wheel")openWheel();else if(k==="mk")openCreator();else if(k==="own")openMine();else if(k==="rutin")openRutin();else if(k==="album")openAlbum();else{cat=k;chips();list();$("chips").scrollIntoView({behavior:"smooth",block:"start"})}})}
 function chips(){drawerCats();$("chips").innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="chip ${k==cat?"on":""}" data-k="${k}">${v}<small>${S.filter(s=>inCat(s,k)).length}</small></button>`).join("");
  document.querySelectorAll(".chip[data-k]").forEach(b=>b.onclick=()=>{cat=b.dataset.k;chips();list()})}
 function list(){const q=$("q").value.toLowerCase(),L=S.filter(s=>inCat(s,cat)&&s.title.toLowerCase().includes(q));
@@ -252,10 +257,10 @@ function open(id){stop();cur=S.find(s=>s.id===id);if(!cur)return;markSeen(id);se
  words=[];let html=`<h2>${E(cur.title)}</h2>`;
  cur.text.forEach(p=>{html+="<p>"+p.split(/\s+/).map(w=>{words.push(w);return `<span class="w">${E(w)}</span>`}).join(" ")+"</p>"});
  html+=`<div class="end"><div style="font-size:48px">🌙</div><button class="chip" id="endBack">✓ Vége – vissza a menübe</button><br><button class="chip" id="endWheel">🎡 Másik mesét pörgetek</button></div>`;
- $("story").innerHTML=html;$("endBack").onclick=()=>closeReader();$("endWheel").onclick=()=>{closeReader();setTimeout(openWheel,400)};spans=[...document.querySelectorAll(".w")];
+ $("story").innerHTML=html;$("endBack").onclick=()=>{window.storyDone&&storyDone(cur.id);closeReader()};$("endWheel").onclick=()=>{closeReader();setTimeout(openWheel,400)};spans=[...document.querySelectorAll(".w")];
  let o=0;offs=words.map(w=>{const s=o;o+=w.length+1;return s});
  $("reader").classList.add("open");document.body.classList.add("lock");$("reader").scrollTop=0;idx=0;lm=-1}
-function closeReader(fromPop){stop();renderLast();list();if(window.pendingUpdate){hardRefresh();return}$("reader").classList.remove("open");document.body.classList.remove("lock");
+function closeReader(fromPop){stop();renderLast();list();setTimeout(()=>window.rutinAfterStory&&rutinAfterStory(),400);if(window.pendingUpdate){hardRefresh();return}$("reader").classList.remove("open");document.body.classList.remove("lock");
  if(!fromPop){if(history.state&&history.state.r)history.back();else history.replaceState(null,"",location.pathname)}}
 $("back").onclick=()=>closeReader();$("x").onclick=()=>closeReader();
 
@@ -283,7 +288,7 @@ function speak(){if(!("speechSynthesis" in window))return alert("Ez a böngész�
  speechSynthesis.cancel();speaking=true;wakeOn();gen++;$("play").textContent="⏸";run(idx,gen)}
 function run(start,g){if(!speaking||g!==gen)return;
  if(sleepAt&&Date.now()>=sleepAt){stop();sleepAt=0;sli=0;$("sl").textContent="😴 Ki";toast("Jó éjszakát 🌙");sleepNow();return}
- if(start>=words.length){mark(words.length);stop(true);return}
+ if(start>=words.length){mark(words.length);stop(true);window.storyDone&&storyDone(cur.id);return}
  const end=Math.min(words.length,start+28),seg=words.slice(start,end),so=[];let o=0;seg.forEach(w=>{so.push(o);o+=w.length+1});
  const u=new SpeechSynthesisUtterance(seg.join(" "));u.lang="hu-HU";u.rate=+$("rate").value;u.pitch=1.05;
  if(sleepAt)u.volume=Math.max(.2,Math.min(1,(sleepAt-Date.now())/12e4));
@@ -306,7 +311,8 @@ $("regenImg").onclick=()=>{if(!cur||!window.ImageGenerator)return;if(!navigator.
 // Megosztás: link + QR
 function shareText(){const tx=cur.title+"\n\n"+cur.text.join("\n\n");
  if(navigator.share)navigator.share({title:cur.title,text:tx}).catch(()=>{});else{navigator.clipboard&&navigator.clipboard.writeText(tx);toast("A mese szövege a vágólapra másolva")}}
-function showShare(url,title){$("mt").textContent=title;$("lnk").textContent=url;$("qr").innerHTML="";drawQR($("qr"),url,200);
+function shareLink(u){try{const x=new URL(u);x.searchParams.set("i","1");return x.toString()}catch(e){return u}}
+function showShare(url,title){url=shareLink(url);let sn=$("shn");if(!sn){sn=document.createElement("small");sn.id="shn";sn.style.cssText="display:block;color:var(--sub);margin-top:8px";$("lnk").after(sn)}sn.textContent="📲 Aki megnyitja, azonnal telepítési segítséget kap.";$("mt").textContent=title;$("lnk").textContent=url;$("qr").innerHTML="";drawQR($("qr"),url,200);
  $("copy").textContent="Link másolása";$("instShare").style.display=standalone?"none":"inline-block";$("modal").classList.add("open");
  $("copy").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(url);$("copy").textContent="Másolva ✓"};
  $("nat").style.display=navigator.share?"inline-block":"none";
@@ -339,7 +345,7 @@ function spin(){if(spinning)return;spinning=true;$("wres").innerHTML="🎶";$("s
  })(t0)}
 $("spin").onclick=spin;
 $("wclose").onclick=()=>{try{speechSynthesis.cancel()}catch(e){}$("wheelModal").classList.remove("open")};
-window.onpopstate=()=>{window.alkotoPop&&alkotoPop();if($("reader").classList.contains("open"))closeReader(true);$("modal").classList.remove("open");$("wheelModal").classList.remove("open")};
+window.onpopstate=()=>{window.alkotoPop&&alkotoPop();window.extrasPop&&extrasPop();if($("reader").classList.contains("open"))closeReader(true);$("modal").classList.remove("open");$("wheelModal").classList.remove("open")};
 document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>({
  home:()=>{cat="all";$("q").value="";chips();list();scrollTo({top:0,behavior:"smooth"})},
  list:()=>$("chips").scrollIntoView({behavior:"smooth",block:"start"}),
@@ -365,14 +371,33 @@ const ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="
 function snoozed(){try{return Date.now()-(+localStorage.instNo||0)<6048e5}catch(e){return false}}
 function maybeInstall(force){if(standalone||(!force&&snoozed()))return;$("install").classList.add("on")}
 function hideInstall(s){$("install").classList.remove("on");if(s)try{localStorage.instNo=Date.now()}catch(e){}}
-async function doInstall(){if(dip){dip.prompt();try{await dip.userChoice}catch(e){}dip=null;hideInstall();return}
- if(ios)$("iosm").classList.add("open");else toast("Chrome menü (⋮) → Alkalmazás telepítése")}
-window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();dip=e;maybeInstall(true)});
-window.addEventListener("appinstalled",()=>hideInstall());
-if(ios)setTimeout(()=>maybeInstall(true),2500);
-$("instBtn").onclick=doInstall;$("instX").onclick=()=>hideInstall(true);$("iosx").onclick=()=>$("iosm").classList.remove("open");
+const UA=navigator.userAgent;
+const inApp=/FBAN|FBAV|FB_IAB|Instagram|Messenger|Line\/|MicroMessenger|Snapchat|TikTok|BytedanceWebview|Viber|; wv\)/i.test(UA);
+const iosSafari=ios&&!inApp&&!/CriOS|FxiOS|EdgiOS|OPiOS/i.test(UA);
+const ipad=/ipad/i.test(UA)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+const andr=/android/i.test(UA);
+const FAST=new URLSearchParams(location.search).get("i")==="1";
+const stepsHTML=a=>a.map((s,i)=>`<div class="stp"><i>${i+1}</i><span>${s}</span></div>`).join("");
+function helperHTML(){
+ if(inApp)return `<div style="font-size:54px">🌐</div><b style="font-size:20px">Előbb nyisd meg böngészőben</b><p style="color:var(--sub)">Az üzenetküldő beépített böngészőjében nem lehet telepíteni.</p>`+stepsHTML(["Koppints a <b>⋮</b> vagy <b>⋯</b> menüre (jobb felül vagy alul)","Válaszd: <b>Megnyitás böngészőben</b> ("+(ios?"Safari":"Chrome")+")","Ott megjelenik a telepítés"]);
+ if(ios)return `<div style="font-size:54px">📲</div><b style="font-size:20px">Telepítés 3 koppintással</b>`+(iosSafari?"":`<p style="color:var(--sub);font-size:14px">Ha nem látod a Megosztás gombot, nyisd meg a linket Safariban.</p>`)+stepsHTML([`Koppints a <b>Megosztás</b> ⬆️ gombra ${ipad?"(jobb felül)":"(alul, a sávban)"}`,"Görgess le, és válaszd: <b>Főképernyőhöz adás</b> ➕","Koppints: <b>Hozzáadás</b>"])+`<p style="color:var(--sub);font-size:14px">✨ Utána teljes képernyőn, internet nélkül is megy.</p>`;
+ if(dip)return `<div style="font-size:54px">📲</div><b style="font-size:20px">Egy koppintás, és kész</b><p>Az app a kezdőképernyőre kerül, és offline is működik.</p><button class="chip big go" id="ithGo" style="background:var(--pri);color:#fff;font-size:20px;padding:16px 30px">📲 Telepítés most</button>`;
+ return `<div style="font-size:54px">📲</div><b style="font-size:20px">Telepítés Androidon</b>`+stepsHTML(["Koppints a <b>⋮</b> menüre (jobb felül)","Válaszd: <b>Alkalmazás telepítése</b> vagy <b>Hozzáadás a kezdőképernyőhöz</b>","Koppints: <b>Telepítés</b>"])}
+function closeHelper(){$("insth").classList.remove("open");$("insArrow").style.display="none"}
+function openHelper(){if(standalone)return;$("ith").innerHTML=helperHTML();$("ithCopy").textContent="🔗 Link másolása";$("insth").classList.add("open");
+ const ar=$("insArrow");ar.style.display=(iosSafari)?"block":"none";ar.className="insarrow "+(ipad?"tr":"bt");
+ const g=$("ithGo");if(g)g.onclick=async()=>{closeHelper();await nativeInstall()}}
+async function nativeInstall(){if(!dip)return;dip.prompt();try{await dip.userChoice}catch(e){}dip=null;hideInstall()}
+function doInstall(){if(dip)return nativeInstall();openHelper()}
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();dip=e;maybeInstall(true);if(FAST)openHelper()});
+window.addEventListener("appinstalled",()=>{hideInstall();closeHelper()});
+$("instBtn").onclick=doInstall;$("instX").onclick=()=>hideInstall(true);$("ithX").onclick=closeHelper;
+$("ithCopy").onclick=()=>{const u=location.origin+location.pathname;try{navigator.clipboard.writeText(u)}catch(e){}$("ithCopy").textContent="Másolva ✓"};
 $("instShare").onclick=()=>{$("modal").classList.remove("open");doInstall()};
-if(ios)$("instText").textContent="Add a kezdőképernyőhöz Safari megosztás gombjával";
+$("instText").textContent=inApp?"Nyisd meg böngészőben, onnan telepíthető":ios?"Koppints a Megosztás ⬆️ gombra, majd: Főképernyőhöz adás":"Offline is működik, ikon a kezdőképernyőn";
+// Megosztott linkről érkezők: azonnali telepítési segítség (a linkhez ?i=1 kerül)
+if(FAST){try{history.replaceState(history.state,"",location.pathname+location.hash)}catch(e){}}
+if(!standalone){if(FAST){maybeInstall(true);setTimeout(()=>{if(ios||inApp||(!dip&&andr))openHelper()},ios||inApp?800:2500)}else if(ios)setTimeout(()=>maybeInstall(true),2500)}
 // Oldalról nyíló fülek: bal menü és jobb beállítás panel
 const dOpen=o=>{$("drawer").classList.toggle("open",o);$("scrim").classList.toggle("on",o)};
 const pOpen=o=>{$("panel").classList.toggle("open",o);$("scrim").classList.toggle("on",o)};
@@ -381,7 +406,7 @@ function drawerCats(){const e=$("dcats");if(!e)return;e.innerHTML=Object.entries
  e.querySelectorAll("button").forEach(b=>b.onclick=()=>{const k=b.dataset.k2;closeAll();setTimeout(()=>{cat=k;chips();list();$("chips").scrollIntoView({behavior:"smooth"})},30)})}
 function closeAll(){dOpen(false);pOpen(false);if($("reader").classList.contains("open"))closeReader(true);window.alkotoPop&&alkotoPop()}
 const DA={home:()=>{cat="all";$("q").value="";chips();list();scrollTo({top:0,behavior:"smooth"})},mk:()=>openCreator(),wheel:()=>openWheel(),
- own:()=>openMine(),upd:()=>checkUpdate(true),inst:()=>doInstall(),share:()=>window.homeShare()};
+ own:()=>openMine(),rutin:()=>openRutin(),album:()=>openAlbum(),upd:()=>checkUpdate(true),inst:()=>doInstall(),share:()=>window.homeShare()};
 document.querySelectorAll(".dbtn[data-d]").forEach(b=>b.onclick=()=>{const k=b.dataset.d;if(k==="night"){window.toggleNight();return}closeAll();setTimeout(DA[k],40)});
 $("menuBtn").onclick=()=>dOpen(true);$("dClose").onclick=()=>dOpen(false);$("scrim").onclick=()=>{dOpen(false);pOpen(false)};
 $("gear").onclick=()=>pOpen(true);$("pClose").onclick=()=>pOpen(false);$("pnight").onclick=()=>window.toggleNight();
@@ -411,5 +436,6 @@ fetch("version.json",{cache:"no-store"}).then(r=>r.json()).then(j=>{$("verNum").
 window.addEventListener('online',()=>toast("🌐 Internet újra elérhető - AI képek generálhatók"));
 window.addEventListener('offline',()=>toast("📡 Nincs internet - offline mód aktiválva"));
 </script>
+<script src="extras.js"></script>
 </body>
 </html>
