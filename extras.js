@@ -10,10 +10,12 @@ const ST={done:LS.get("doneS",{}),days:LS.get("mDays",{}),rut:LS.get("rutS",{})}
 // ---------- hang
 let ac=null;const actx=()=>ac||(ac=new(window.AudioContext||window.webkitAudioContext)());
 function chime(notes,step,vol){try{const c=actx();(notes||[523,659,784,1047]).forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain(),t=c.currentTime+i*(step||.14);o.type="sine";o.frequency.value=f;o.connect(g);g.connect(c.destination);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol||.18,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+.55);o.start(t);o.stop(t+.6)})}catch(e){}}
-function sayX(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="hu-HU";u.rate=+Q("rate").value||.85;const v=voices[+Q("voice").value];if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}
+function sayX(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="hu-HU";u.rate=+Q("rate").value||.85;const v=voices[+Q("voice").value];if(v)u.voice=v;setTimeout(()=>{try{speechSynthesis.speak(u)}catch(e){}},45)}catch(e){}}
+// iOS: a hang csak felhasználói érintés után indulhat, ezért az első érintésre felébresztjük
+["touchend","click"].forEach(ev=>document.addEventListener(ev,()=>{try{const c=actx();if(c.state==="suspended")c.resume()}catch(e){}},{once:true,passive:true}));
 
 // ---------- altató háttérhangok (a telefon állítja elő, nincs hozzá fájl)
-const AMBS=[["","Ki"],["eso","🌧️ Eső"],["tenger","🌊 Tenger"],["szel","🍃 Szél"],["tucsok","🦗 Tücsök"]];
+const AMBS=[["","Ki"],["eso","🌧️ Eső"],["tenger","🌊 Tenger"],["szel","🍃 Szél"],["tucsok","🦗 Tücsök"],["zene","🎵 Zenedoboz"]];
 const amb={kind:"",master:null,src:[],tm:[],tick:null};let ambVol=+LS.get("ambVol",.4);
 const saAt=()=>(typeof sleepAt!=="undefined")?sleepAt:0;
 function ambLevel(){const s=saAt();return s?Math.max(0,Math.min(1,(s-Date.now())/12e4)):1}
@@ -28,6 +30,15 @@ function ambSet(kind){ambClear();clearInterval(amb.tick);amb.kind=kind||"";
   if(kind==="eso"){const n=noise(),h=flt("highpass",900),l=flt("lowpass",7000),g=gn(.55);n.connect(h);h.connect(l);l.connect(g);g.connect(m)}
   else if(kind==="tenger"){const n=noise(),l=flt("lowpass",650),g=gn(.6);n.connect(l);l.connect(g);g.connect(m);lfo(.11,.45,g.gain)}
   else if(kind==="szel"){const n=noise(),b=flt("bandpass",420,.8),g=gn(.6);n.connect(b);b.connect(g);g.connect(m);lfo(.07,.4,g.gain);lfo(.05,220,b.frequency)}
+  else if(kind==="zene"){
+   // saját, lassú, pentaton "zenedoboz": a dallamot a gép véletlenszerűen, nyugodt lépésekben építi
+   const sc=[0,2,4,7,9,12,14,16],dly=c.createDelay(1),fb=gn(.36),dg=gn(.5);dly.delayTime.value=.46;amb.src.push(dly);dly.connect(fb);fb.connect(dly);dly.connect(dg);dg.connect(m);
+   let i=3;const bell=(semi,t,vol)=>{const f=261.63*Math.pow(2,semi/12);
+    [[1,vol],[2,vol*.3],[3.01,vol*.1]].forEach(([mul,v])=>{const o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.value=f*mul;o.connect(g);g.connect(m);g.connect(dly);
+     g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.0008,t+(mul===1?2.4:1.1));o.start(t);o.stop(t+2.6)})};
+   const play=()=>{if(amb.kind!=="zene")return;const r=Math.random();i=Math.max(0,Math.min(sc.length-1,i+(r<.34?-1:r<.68?1:r<.82?-2:r<.94?2:0)));
+    if(Math.random()>.12)bell(sc[i],c.currentTime+.02,.2);
+    const beat=1.05,d=[1,1,2,1,1,3][Math.floor(Math.random()*6)]*beat;amb.tm.push(setTimeout(play,d*1000))};play()}
   else if(kind==="tucsok"){const chirp=()=>{if(amb.kind!=="tucsok")return;const f=4200+Math.random()*500,t0=c.currentTime;
     for(let k=0;k<3;k++){const o=c.createOscillator(),g=c.createGain(),t=t0+k*.11;o.type="sine";o.frequency.value=f;o.connect(g);g.connect(m);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.2,t+.02);g.gain.linearRampToValueAtTime(0,t+.07);o.start(t);o.stop(t+.09)}
     amb.tm.push(setTimeout(chirp,900+Math.random()*2200))};chirp();amb.tm.push(setTimeout(chirp,700))}
@@ -35,7 +46,7 @@ function ambSet(kind){ambClear();clearInterval(amb.tick);amb.kind=kind||"";
   amb.tick=setInterval(()=>{if(!amb.master)return;const s=saAt();if(s&&Date.now()>=s){ambSet("");return}amb.master.gain.setTargetAtTime(ambVol*ambLevel(),actx().currentTime,.8)},3000)
  }catch(e){amb.kind=""}}
  ambRender()}
-function ambRender(){document.querySelectorAll(".ambui").forEach(e=>{e.innerHTML=AMBS.map(a=>`<button class="chip ${amb.kind===a[0]?"on":""}" data-amb="${a[0]}">${a[1]}</button>`).join("")+`<input type="range" class="ambvol" min="0.05" max="1" step="0.05" value="${ambVol}" title="Hangerő" style="width:100%;margin-top:8px;accent-color:var(--pri)">`})}
+function ambRender(){document.querySelectorAll(".ambui").forEach(e=>{e.innerHTML=AMBS.map(a=>`<button class="chip ${amb.kind===a[0]?"on":""}" data-amb="${a[0]}">${a[1]}</button>`).join("")+`<input type="range" class="ambvol" min="0.05" max="1" step="0.05" value="${ambVol}" title="Hangerő" style="width:100%;margin-top:8px;accent-color:var(--pri)">`+(/iphone|ipad/i.test(navigator.userAgent)?`<small style="width:100%;text-align:center;color:var(--sub)">🔇 Ha nem hallod, nézd meg a telefon oldalán a némító kapcsolót.</small>`:"")})}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-amb]");if(b)ambSet(b.dataset.amb)});
 document.addEventListener("input",e=>{if(e.target.classList.contains("ambvol")){ambVol=+e.target.value;LS.set("ambVol",ambVol);document.querySelectorAll(".ambvol").forEach(x=>{if(x!==e.target)x.value=ambVol});if(amb.master)amb.master.gain.setTargetAtTime(ambVol*ambLevel(),actx().currentTime,.2)}});
 
@@ -44,7 +55,7 @@ function pushR(h){if(history.state&&history.state.r)history.replaceState({r:1},"
 function popOut(fp){if(!fp){if(history.state&&history.state.r)history.back();else history.replaceState(null,"",location.pathname)}}
 let rtm=null;
 function closeOv(id,fp){clearInterval(rtm);try{speechSynthesis.cancel()}catch(e){}Q(id).classList.remove("open");document.body.classList.remove("lock");popOut(fp)}
-window.extrasPop=()=>["rutin","album"].forEach(id=>{const e=Q(id);if(e&&e.classList.contains("open"))closeOv(id,true)});
+window.extrasPop=()=>["rutin","album","breath"].forEach(id=>{const e=Q(id);if(e&&e.classList.contains("open"))closeOv(id,true)});
 
 function ensureUI(){if(Q("rutin"))return;
  const css=document.createElement("style");css.textContent=`
@@ -58,14 +69,22 @@ function ensureUI(){if(Q("rutin"))return;
 .week{display:flex;gap:6px;justify-content:center;margin:8px 0 14px}.wd{position:relative;flex:1;max-width:76px;background:var(--card);border-radius:16px;padding:8px 2px;text-align:center}.wd.t{outline:3px solid var(--pri)}.wd small{display:block;color:var(--sub);font-size:12px}.wd span{font-size:26px}.wd i{position:absolute;top:-6px;right:-2px;font-style:normal;font-size:16px}
 .sg{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.sk{border-radius:18px;padding:12px 4px 8px;text-align:center;color:#fff;text-shadow:0 1px 3px #0006;min-height:96px}.sk .e{display:block;font-size:40px;line-height:1.2}.sk small{display:block;font-size:11px;line-height:1.15;margin-top:2px}.sk.lk{background:var(--card);color:var(--sub);text-shadow:none}.sk.lk .e{filter:grayscale(1);opacity:.22}
 .bnc{font-size:90px;animation:bnc 1s ease-in-out infinite}@keyframes bnc{50%{transform:scale(1.18) rotate(-6deg)}}
+#breath{z-index:7}.moonwrap{display:grid;place-items:center;height:330px;margin-top:6px}.moon{width:170px;height:170px;border-radius:50%;background:radial-gradient(circle at 34% 30%,#fffbe0,#ffe08a 55%,#e9a93b);box-shadow:0 0 60px 10px #ffd86b66,inset -12px -10px 24px #c9852b55}body.night .moon{filter:brightness(.85)}.bm{display:flex;gap:8px;flex-wrap:wrap}
+@keyframes shk{25%{translate:-8px 0}75%{translate:8px 0}}.shake{animation:shk .3s}
 @media(min-width:700px){.sg{grid-template-columns:repeat(6,1fr)}.rcards{grid-template-columns:repeat(3,1fr)}.rcard{flex-direction:column;text-align:center}}`;
  document.head.appendChild(css);
  document.body.insertAdjacentHTML("beforeend",`
 <section class="reader" id="rutin"><div class="xtop"><b>🛁 Esti rutin</b><button class="round" data-r="close" title="Bezár">✕</button></div><div class="xw" id="rutinBody"></div><div class="xbar" id="rutinBar"></div></section>
 <section class="reader" id="album"><div class="xtop"><button class="chip" data-x="back">← Vissza</button><b>🏅 Matricáim</b><span style="width:56px"></span></div><div class="xw" id="albumBody"></div></section>
+<section class="reader" id="breath"><div class="xtop"><b>🌬️ Lélegző hold</b><button class="round" data-b="close" title="Bezár">✕</button></div><div class="xw" style="text-align:center"><div class="moonwrap"><div class="moon" id="moon"></div></div><div class="rt" id="bt"></div><div class="rh" id="bsub"></div><div class="rh" id="bdots" style="letter-spacing:4px"></div></div><div class="xbar" id="breathBar"></div></section>
+<div class="modal" id="gate" style="z-index:20"><div class="box"><b>🔒 Szülői zár</b><p id="gq" style="font-size:19px"></p><div class="row" id="ga" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"></div><button class="chip" data-g="x" style="margin-top:12px">Mégse</button></div></div>
 <div class="modal" id="stkm"><div class="box"><div class="bnc" id="stke">⭐</div><b>🎉 Új matrica!</b><p id="stkt"></p><button class="chip" data-x="album">🏅 Matricáim</button> <button class="chip" data-x="ok" style="background:var(--pri);color:#fff">Szuper!</button></div></div>`);
  Q("rutin").addEventListener("click",e=>{const b=e.target.closest("[data-r],[data-pick]");if(!b)return;if(b.dataset.pick)return rpick(b.dataset.pick);ract(b.dataset.r)});
  Q("album").addEventListener("click",e=>{const b=e.target.closest("[data-x],[data-sk]");if(!b)return;if(b.dataset.sk){Q("album").classList.remove("open");return open(b.dataset.sk)}closeOv("album")});
+ Q("breath").addEventListener("click",e=>{const b=e.target.closest("[data-b]");if(!b)return;if(b.dataset.b==="close")return closeOv("breath");bract(b.dataset.b)});
+ Q("gate").addEventListener("click",e=>{const b=e.target.closest("[data-gv],[data-g]");if(!b&&e.target.id!=="gate")return;
+  if(b&&b.dataset.gv){if(+b.dataset.gv===window.__gateOk){Q("gate").classList.remove("open");const cb=window.__gateCb;window.__gateCb=null;cb&&cb()}else{Q("gate").querySelector(".box").classList.add("shake");setTimeout(()=>{Q("gate").querySelector(".box").classList.remove("shake");gateAsk(window.__gateCb)},320)}return}
+  Q("gate").classList.remove("open");window.__gateCb=null});
  Q("stkm").addEventListener("click",e=>{const b=e.target.closest("[data-x]");if(!b&&e.target.id!=="stkm")return;Q("stkm").classList.remove("open");if(b&&b.dataset.x==="album")openAlbum()})}
 
 // ---------- matricák
@@ -114,6 +133,38 @@ function finishRutin(){ST.rut[today()]=true;LS.set("rutS",ST.rut);ST.days[today(
  if(amb.kind){try{sleepAt=Date.now()+30*6e4;sli=2;Q("sl").textContent="😴 30 perc"}catch(e){}}
  closeOv("rutin");setTimeout(()=>{try{sleepNow()}catch(e){}},300);window.tiles&&tiles()}
 
-window.openRutin=openRutin;window.openAlbum=openAlbum;window.ambSet=ambSet;
-ensureUI();ambRender();window.tiles&&tiles();
+// ---------- szülői zár
+let pLock=!!LS.get("pLock",false);
+function updLock(){const e=Q("dlock");if(e)e.textContent=pLock?"BE":"KI"}
+window.parentGate=function(cb){if(!pLock)return cb();ensureUI();gateAsk(cb)};
+function gateAsk(cb){const a=6+Math.floor(Math.random()*4),b=4+Math.floor(Math.random()*5),ok=a+b,set=new Set([ok]);while(set.size<4){const v=ok+Math.floor(Math.random()*9)-4;if(v>2&&v!==ok)set.add(v)}
+ Q("gq").textContent="Csak felnőtteknek: mennyi "+a+" + "+b+"?";
+ Q("ga").innerHTML=shuf([...set]).map(v=>`<button class="chip big" data-gv="${v}">${v}</button>`).join("");
+ Q("gate").classList.add("open");window.__gateCb=cb;window.__gateOk=ok}
+window.lockToggle=()=>{if(pLock)parentGate(()=>{pLock=false;LS.set("pLock",false);updLock();window.toast&&toast("Szülői zár kikapcsolva")});else{pLock=true;LS.set("pLock",true);updLock();window.toast&&toast("Szülői zár bekapcsolva 🔒")}};
+
+// ---------- lélegző hold
+const BR={run:false,t:[],mins:1,snd:true};
+function brClear(){BR.t.forEach(clearTimeout);BR.t=[];BR.run=false}
+function openBreath(){ensureUI();pushR("lelegzes");Q("breath").classList.add("open");document.body.classList.add("lock");brReset()}
+function brReset(){brClear();const m=Q("moon");m.style.transition="none";m.style.transform="scale(1)";Q("bt").textContent="Készen állsz?";Q("bsub").textContent="Együtt lélegzünk a holddal.";Q("bdots").innerHTML="";
+ Q("breathBar").innerHTML=`<div class="bm">${[1,2,3].map(n=>`<button class="chip ${BR.mins===n?"on":""}" data-b="m${n}">${n} perc</button>`).join("")}<button class="chip" data-b="snd">${BR.snd?"🔊":"🔇"}</button></div><button class="chip big go" data-b="go">▶ Kezdjük</button>`}
+function brStart(){brClear();BR.run=true;const sc=window.BREATH_SCALE||1,cycles=Math.round(BR.mins*60/11),m=Q("moon");let n=0;
+ Q("breathBar").innerHTML=`<button class="chip" data-b="stop">■ Megállok</button>`;
+ const say=t=>{if(BR.snd)sayX(t)};
+ const cyc=()=>{if(!BR.run)return;if(n>=cycles)return brEnd();n++;Q("bdots").textContent="●".repeat(n)+"○".repeat(cycles-n);
+  Q("bt").textContent="Lélegezz be…";Q("bsub").textContent="Lassan, az orrodon át";say("Lélegezz be.");m.style.transition="transform "+4*sc+"s ease-in-out";m.style.transform="scale(1.55)";
+  BR.t.push(setTimeout(()=>{Q("bt").textContent="Tartsd egy kicsit…";Q("bsub").textContent=""},4000*sc));
+  BR.t.push(setTimeout(()=>{Q("bt").textContent="Fújd ki lassan…";Q("bsub").textContent="Mintha egy mécsest fújnál";say("Fújd ki lassan.");m.style.transition="transform "+6*sc+"s ease-in-out";m.style.transform="scale(1)"},5000*sc));
+  BR.t.push(setTimeout(cyc,11000*sc))};cyc()}
+function brEnd(){brClear();chime([523,659,784],.25,.14);Q("bt").textContent="Nagyon ügyes vagy! 🌙";Q("bsub").textContent="Most már jöhet az álom. Jó éjszakát!";if(BR.snd)sayX("Nagyon ügyes vagy. Jó éjszakát.");
+ Q("breathBar").innerHTML=`<button class="chip" data-b="again">🔁 Még egyszer</button><button class="chip big go" data-b="dark">🌑 Sötét képernyő</button>`}
+function bract(a){if(a==="m1"||a==="m2"||a==="m3"){BR.mins=+a[1];return brReset()}
+ if(a==="snd"){BR.snd=!BR.snd;try{speechSynthesis.cancel()}catch(e){}return brReset()}
+ if(a==="go")return brStart();if(a==="stop"||a==="again")return brReset();
+ if(a==="dark"){closeOv("breath");setTimeout(()=>{try{sleepNow()}catch(e){}},300)}}
+// ---------- gyors altató: zenedoboz 30 percig + sötét képernyő
+window.quickLullaby=function(){ambSet("zene");try{sleepAt=Date.now()+30*6e4;sli=2;Q("sl").textContent="😴 30 perc"}catch(e){}window.toast&&toast("Zenedoboz 30 percig 🎵");setTimeout(()=>{try{sleepNow()}catch(e){}},500)};
+window.openBreath=openBreath;window.openRutin=openRutin;window.openAlbum=openAlbum;window.ambSet=ambSet;
+ensureUI();ambRender();updLock();window.tiles&&tiles();
 })();

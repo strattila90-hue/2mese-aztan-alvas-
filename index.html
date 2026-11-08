@@ -167,10 +167,10 @@ body.lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 <div class="scrim" id="scrim"></div>
 <aside class="drawer" id="drawer"><div class="dh"><img src="icon-192.png" alt=""><b>2mese és alvás</b><button class="round" id="dClose" title="Bezár">✕</button></div>
  <div class="dsec">Menü</div>
- <button class="dbtn" data-d="home"><span>🏠 Főoldal</span></button><button class="dbtn" data-d="rutin"><span>🛁 Esti rutin</span></button><button class="dbtn" data-d="album"><span>🏅 Matricáim</span></button><button class="dbtn" data-d="mk"><span>🧩 Mesealkotó</span></button><button class="dbtn" data-d="wheel"><span>🎡 Szerencsekerék</span></button><button class="dbtn" data-d="own"><span>⭐ Saját meséim</span></button>
+ <button class="dbtn" data-d="home"><span>🏠 Főoldal</span></button><button class="dbtn" data-d="rutin"><span>🛁 Esti rutin</span></button><button class="dbtn" data-d="album"><span>🏅 Matricáim</span></button><button class="dbtn" data-d="breath"><span>🌬️ Lélegző hold</span></button><button class="dbtn" data-d="lull"><span>🎵 Altató zene</span></button><button class="dbtn" data-d="mk"><span>🧩 Mesealkotó</span></button><button class="dbtn" data-d="wheel"><span>🎡 Szerencsekerék</span></button><button class="dbtn" data-d="own"><span>⭐ Saját meséim</span></button>
  <div class="dsec">Kategóriák</div><div id="dcats"></div>
  <div class="dsec">Beállítások</div>
- <button class="dbtn" data-d="night"><span>🌙 Éjszakai mód</span><b class="sw" id="dnight"></b></button><button class="dbtn" data-d="upd"><span>🔄 Frissítés</span></button><button class="dbtn" data-d="inst" id="dinst"><span>📲 Telepítés</span></button><button class="dbtn" data-d="share"><span>🔗 App megosztása</span></button>
+ <button class="dbtn" data-d="lock"><span>🔒 Szülői zár</span><b class="sw" id="dlock"></b></button><button class="dbtn" data-d="night"><span>🌙 Éjszakai mód</span><b class="sw" id="dnight"></b></button><button class="dbtn" data-d="upd"><span>🔄 Frissítés</span></button><button class="dbtn" data-d="inst" id="dinst"><span>📲 Telepítés</span></button><button class="dbtn" data-d="share"><span>🔗 App megosztása</span></button>
 </aside>
 <aside class="panel" id="panel"><div class="dh"><b>⚙️ Olvasás beállításai</b><button class="round" id="pClose" title="Bezár">✕</button></div>
  <div class="dsec">🗣️ Hang</div><div class="prow"><select id="voice" title="Hang"></select></div>
@@ -239,9 +239,9 @@ function renderLast(){let s=null;try{s=S.find(x=>x.id===localStorage.lastS)}catc
  $("last").innerHTML=s?`<div class="last" id="lastc"><span class="le" style="background:${grad(s)}">${s.emoji}</span><div><small>🔁 Legutóbb hallgattátok</small><b>${E(s.title)}</b></div><span style="font-size:22px">▶</span></div>`:"";
  if(s)$("lastc").onclick=()=>open(s.id)}
 function tiles(){const n=S.filter(x=>x.custom).length;
- const T=[["wheel","🎡","Szerencsekerék","Pörgess egy mesét!","#f093fb,#f5576c"],["mk","🧩","Mesealkotó","Alkossatok együtt!","#4facfe,#0090d8"],["esti","🌙","Altatómesék","Rövid és álmos","#5f2c82,#49a09d"],["rutin","🛁","Esti rutin","Lépésről lépésre","#43cea2,#185a9d"],["album","🏅","Matricáim",(window.albumInfo?albumInfo().got+" / "+albumInfo().total+" gyűjtve":"Gyűjtsd össze!"),"#f6d365,#e8943a"],["own","⭐","Saját meséim",n?n+" mese · írj még!":"Írj egyet!","#f7971e,#e8a400"]];
+ const T=[["wheel","🎡","Szerencsekerék","Pörgess egy mesét!","#f093fb,#f5576c"],["mk","🧩","Mesealkotó","Alkossatok együtt!","#4facfe,#0090d8"],["esti","🌙","Altatómesék","Rövid és álmos","#5f2c82,#49a09d"],["breath","🌬️","Lélegző hold","Nyugtató légzés","#5f72bd,#9921e8"],["lull","🎵","Altató zene","30 perc zenedoboz","#614385,#516395"],["rutin","🛁","Esti rutin","Lépésről lépésre","#43cea2,#185a9d"],["album","🏅","Matricáim",(window.albumInfo?albumInfo().got+" / "+albumInfo().total+" gyűjtve":"Gyűjtsd össze!"),"#f6d365,#e8943a"],["own","⭐","Saját meséim",n?n+" mese · írj még!":"Írj egyet!","#f7971e,#e8a400"]];
  $("tiles").innerHTML=T.map(t=>`<button class="tile" data-t="${t[0]}" style="background:linear-gradient(135deg,${t[4]})"><span class="ti">${t[1]}</span><b>${t[2]}</b><small>${t[3]}</small></button>`).join("");
- document.querySelectorAll(".tile").forEach(b=>b.onclick=()=>{const k=b.dataset.t;if(k==="wheel")openWheel();else if(k==="mk")openCreator();else if(k==="own")openMine();else if(k==="rutin")openRutin();else if(k==="album")openAlbum();else{cat=k;chips();list();$("chips").scrollIntoView({behavior:"smooth",block:"start"})}})}
+ document.querySelectorAll(".tile").forEach(b=>b.onclick=()=>{const k=b.dataset.t;if(k==="wheel")openWheel();else if(k==="mk")openCreator();else if(k==="own")openMine();else if(k==="rutin")openRutin();else if(k==="breath")openBreath();else if(k==="lull")quickLullaby();else if(k==="album")openAlbum();else{cat=k;chips();list();$("chips").scrollIntoView({behavior:"smooth",block:"start"})}})}
 function chips(){drawerCats();$("chips").innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="chip ${k==cat?"on":""}" data-k="${k}">${v}<small>${S.filter(s=>inCat(s,k)).length}</small></button>`).join("");
  document.querySelectorAll(".chip[data-k]").forEach(b=>b.onclick=()=>{cat=b.dataset.k;chips();list()})}
 function list(){const q=$("q").value.toLowerCase(),L=S.filter(s=>inCat(s,cat)&&s.title.toLowerCase().includes(q));
@@ -374,7 +374,7 @@ async function checkUpdate(manual){
   if(manual)toast("✓ Nincs új verzió")
  }catch(e){if(manual){toast("❌ Nincs internet");$("upd").classList.remove("spin");$("updIcon").style.display="inline";$("updPct").style.display="none"}}
 }
-$("upd").onclick=()=>checkUpdate(true);
+$("upd").onclick=()=>window.parentGate?parentGate(()=>checkUpdate(true)):checkUpdate(true);
 // Telepítés (Android: natív kérés, iOS: útmutató)
 let dip=null;const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone;
 const ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
@@ -422,10 +422,10 @@ const pOpen=o=>{$("panel").classList.toggle("open",o);$("scrim").classList.toggl
 function updNight(){$("dnight").textContent=document.body.classList.contains("night")?"BE":"KI"}
 function drawerCats(){const e=$("dcats");if(!e)return;e.innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="dbtn ${k==cat?"on":""}" data-k2="${k}"><span>${v}</span><small>${S.filter(s=>inCat(s,k)).length}</small></button>`).join("");
  e.querySelectorAll("button").forEach(b=>b.onclick=()=>{const k=b.dataset.k2;closeAll();setTimeout(()=>{cat=k;chips();list();$("chips").scrollIntoView({behavior:"smooth"})},30)})}
-function closeAll(){dOpen(false);pOpen(false);if($("reader").classList.contains("open"))closeReader(true);window.alkotoPop&&alkotoPop()}
+function closeAll(){dOpen(false);pOpen(false);window.extrasPop&&extrasPop();if($("reader").classList.contains("open"))closeReader(true);window.alkotoPop&&alkotoPop()}
 const DA={home:()=>{cat="all";$("q").value="";chips();list();scrollTo({top:0,behavior:"smooth"})},mk:()=>openCreator(),wheel:()=>openWheel(),
- own:()=>openMine(),rutin:()=>openRutin(),album:()=>openAlbum(),upd:()=>checkUpdate(true),inst:()=>doInstall(),share:()=>window.homeShare()};
-document.querySelectorAll(".dbtn[data-d]").forEach(b=>b.onclick=()=>{const k=b.dataset.d;if(k==="night"){window.toggleNight();return}closeAll();setTimeout(DA[k],40)});
+ own:()=>openMine(),rutin:()=>openRutin(),album:()=>openAlbum(),upd:()=>window.parentGate?parentGate(()=>checkUpdate(true)):checkUpdate(true),breath:()=>openBreath(),lull:()=>quickLullaby(),inst:()=>doInstall(),share:()=>window.homeShare()};
+document.querySelectorAll(".dbtn[data-d]").forEach(b=>b.onclick=()=>{const k=b.dataset.d;if(k==="night"){window.toggleNight();return}if(k==="lock"){window.lockToggle&&lockToggle();return}closeAll();setTimeout(DA[k],40)});
 $("menuBtn").onclick=()=>dOpen(true);$("dClose").onclick=()=>dOpen(false);$("scrim").onclick=()=>{dOpen(false);pOpen(false)};
 $("gear").onclick=()=>pOpen(true);$("pClose").onclick=()=>pOpen(false);$("pnight").onclick=()=>window.toggleNight();
 const setFs=v=>{fs=Math.min(1.7,Math.max(.8,+v.toFixed(2)));document.documentElement.style.setProperty("--fs",fs)};

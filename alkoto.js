@@ -103,7 +103,7 @@ const autoTitle=()=>{const c=ctx();return cap(`${c.H} és ${c.F} meséje`)};
 const PG=["#ffd6e0,#ffb3c6","#d4f1c5,#a8e6a1","#cfe3ff,#9ec5ff","#ffe9b8,#ffd27a","#e6d4ff,#c9a8ff","#c8f1f0,#8fe0dc","#ffd9c2,#ffb48a","#f6e0f0,#e8b4dc"];
 const pic=(id,e,i)=>`<div class="pic" style="--pg:linear-gradient(135deg,${PG[i%PG.length]})"><span class="e">${e}</span><img src="art/${id}.webp" alt="" loading="lazy" onerror="this.remove()"></div>`;
 function dealCards(){const nr=(SE.find(s=>s.id===st.se)||{}).nr;const pool=BT.filter(b=>!st.beats.includes(b.id)&&(!b.need||st.ch.length>=b.need)&&!(nr&&b.id==="eso"));deal=shuf(pool).slice(0,4)}
-function say(t){if(!snd)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="hu-HU";u.rate=+Q("rate").value||.85;const v=voices[+Q("voice").value];if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}
+function say(t){if(!snd)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="hu-HU";u.rate=+Q("rate").value||.85;const v=voices[+Q("voice").value];if(v)u.voice=v;setTimeout(()=>{try{speechSynthesis.speak(u)}catch(e){}},45)}catch(e){}}
 
 // --- felület
 function ensureUI(){if(Q("creator"))return;
@@ -201,7 +201,7 @@ function vPlot(B){const n=st.beats.length;
 function vFin(B){bar(BK+`<button class="chip" data-a="play" title="Meghallgatom">🔊</button><button class="chip big go" data-a="save">💾 Mentés</button>`);
  B.innerHTML=`<div class="pv" style="max-height:none">${st.paras.map(p=>`<p>${esc(p)}</p>`).join("")}</div><p><b>A mese címe:</b></p><input class="search" id="ttl" maxlength="80">`;Q("ttl").value=autoTitle()}
 function vList(B){const m=mine();bar(BK+`<button class="chip big go" data-a="write">✍️ Új mese írása</button>`);
- B.innerHTML=`<div class="row"><button class="chip" data-a="new">🧩 Mesealkotó játék</button><button class="chip" data-a="exp">📤 Mentés fájlba</button><button class="chip" data-a="imp">📥 Betöltés</button></div>`+(m.length?`<p style="text-align:center;font-size:14px;color:var(--sub)">▶ olvasás · ✏️ átnevezés · 📝 szerkesztés · 🗑️ törlés</p>`+m.map(s=>`<div class="li"><span class="e">${s.emoji}</span><b>${esc(s.title)}</b><div class="acts"><button class="round" data-a="read" data-v="${s.id}">▶</button><button class="round" data-a="ren" data-v="${s.id}">✏️</button><button class="round" data-a="ed" data-v="${s.id}">📝</button><button class="round" data-a="del" data-v="${s.id}">🗑️</button></div></div>`).join(""):`<p style="text-align:center">Még nincs saját mesétek. Írjatok egyet a ✍️ gombbal, vagy játsszatok a mesealkotóval! 🌙</p>`)}
+ B.innerHTML=(window.IOS_BROWSER?`<p class="xs" style="background:var(--card);border-radius:14px;padding:10px 12px">📱 iPhone-on a böngészőben a mentett mesék egy hét használat nélkül törlődhetnek. Telepítsd az appot a főképernyőre, vagy mentsd fájlba (📤).</p>`:"")+`<div class="row"><button class="chip" data-a="new">🧩 Mesealkotó játék</button><button class="chip" data-a="exp">📤 Mentés fájlba</button><button class="chip" data-a="imp">📥 Betöltés</button></div>`+(m.length?`<p style="text-align:center;font-size:14px;color:var(--sub)">▶ olvasás · ✏️ átnevezés · 📝 szerkesztés · 🗑️ törlés</p>`+m.map(s=>`<div class="li"><span class="e">${s.emoji}</span><b>${esc(s.title)}</b><div class="acts"><button class="round" data-a="read" data-v="${s.id}">▶</button><button class="round" data-a="ren" data-v="${s.id}">✏️</button><button class="round" data-a="ed" data-v="${s.id}">📝</button><button class="round" data-a="del" data-v="${s.id}">🗑️</button></div></div>`).join(""):`<p style="text-align:center">Még nincs saját mesétek. Írjatok egyet a ✍️ gombbal, vagy játsszatok a mesealkotóval! 🌙</p>`)}
 let edEmoji="📖";
 function vEdit(B,id){const isNew=id==="new",s=isNew?{title:"",text:[]}:mine().find(x=>x.id===id);if(!s)return go("list");
  if(isNew)edEmoji="📖";
@@ -248,7 +248,7 @@ function act(a,v){const f=id=>mine().find(x=>x.id===id);
   if(v==="new"){const w=pp.join(" ").split(/\s+/).length;S().push({id:"my-"+Date.now().toString(36),title:ti||"Saját mesém",emoji:edEmoji,bg:rnd(GR),cat:"sajat",min:Math.max(1,Math.round(w/100)),text:pp,custom:true})}
   else{const s=f(v);s.title=ti||s.title;s.text=pp}
   persist();window.list&&list();window.toast&&toast("Elmentve ✓");go("list");break}
- case"del":{const s=f(v);if(s&&confirm("Biztosan törlöd: „"+s.title+"”?")){S().splice(S().indexOf(s),1);persist();window.list&&list();render()}break}
+ case"del":{const s=f(v);if(!s)break;const run=()=>{if(confirm("Biztosan törlöd: „"+s.title+"”?")){S().splice(S().indexOf(s),1);persist();window.list&&list();render()}};window.parentGate?parentGate(run):run();break}
  }}
 window.__alk={CH,SE,BT,QU,SD,dat,cleanName};
 })();
