@@ -1,18 +1,45 @@
+🇬🇧 English · [🇭🇺 Magyar](README.hu.md)
+
 # 2mese és alvás 🌙
 
-Esti mese app 3–6 éveseknek. Sima HTML, nincs build: GitHubra feltöltöd, Vercelben importálod, kész.
+A Hungarian bedtime-story app for kids aged 3–6, with read-aloud, lullabies and a calming evening routine. Plain HTML, no build step.
 
-## Telepítés
-1. Tedd a fájlokat (`index.html`, `stories.js`) a repo gyökerébe.
-2. Vercel → Add New Project → válaszd a repót → Deploy (Framework: Other).
+![Demo](docs/demo.gif)
 
-## Új mese
-A `stories.js` végére másolj be egy blokkot (id, cím, kategória, emoji, két szín, szöveg bekezdésekben).
-Valódi kép: tedd az `img/` mappába, és add meg `"img":"img/id.webp"` – (a kódban a `.img` és `.cover` elemhez adható).
+![License: MIT](https://img.shields.io/badge/license-MIT-green) ![Last commit](https://img.shields.io/github/last-commit/strattila90-hue/2mese-aztan-alvas-) ![Repo size](https://img.shields.io/github/repo-size/strattila90-hue/2mese-aztan-alvas-) ![PWA](https://img.shields.io/badge/PWA-installable-blueviolet) ![No build step](https://img.shields.io/badge/build-none-lightgrey)
 
-## Megjegyzés
-A felolvasás a telefon beépített magyar hangját használja; Androidon/iOS-en a beállításokban érdemes a jobb minőségű magyar hangot letölteni.
-A népmesék közkincsek; a modern szerzői művek (pl. Bogyó és Babóca) védettek, azokat ne másold be.
+> There is no public live URL listed in this repo (it is deployed on Vercel). See "How to run" below to host your own copy in a couple of minutes.
 
-## Frissítés
-Az app indításkor és visszatéréskor magától ellenőrzi a `version.json` számát. Új mese vagy módosítás feltöltésekor növeld a `v` értékét (pl. `{"v":"9"}`), és a telefonok maguktól frissülnek (a mese végén, olvasás közben nem szakítja meg). Kézzel: 🔄 gomb a főoldal jobb felső sarkában.
+## Features
+- About 40 short stories in Hungarian, in categories (bedtime, folk tales, animals, adventure, longer tales)
+- Read-aloud with the phone's built-in Hungarian voice (Web Speech API)
+- Night mode (switches on automatically in the evening), adjustable text size, favourites
+- Evening routine, breathing "moon" exercise, lullaby player, sticker album
+- Story creator: combine characters, place and plot cards into a new story, and save your own
+- "Wheel of fortune" to pick a random story
+- Optional parental lock
+- Optional AI illustrations (Hugging Face token needed; falls back to generated SVG covers offline)
+- Installable PWA, works offline thanks to a service worker; checks `version.json` and updates itself
+
+## Screenshots
+<p><img src="docs/screenshot-home.png" width="240"> <img src="docs/screenshot-story.png" width="240"></p>
+
+## How to run locally
+```bash
+python3 -m http.server 8801
+# open http://localhost:8801/index.html
+```
+To deploy: push to GitHub, then in Vercel choose Add New Project, select the repo, Framework: Other, Deploy.
+
+Adding a story: append a block to `stories.js` (id, title, category, emoji, two colours, paragraphs). When you change anything, bump `v` in `version.json` and the cache name in `sw.js` so installed phones update.
+
+## Tech
+Vanilla JavaScript, HTML and CSS; Web Speech API; Service Worker (PWA); no dependencies and no build step.
+
+## Contributing
+Contributions are welcome, see [CONTRIBUTING.md](CONTRIBUTING.md). Folk tales are public domain; please do not add modern copyrighted stories.
+
+## License
+[MIT](LICENSE) © 2026 strattila90-hue
+
+⭐ If you like it, please give it a star — it really helps!

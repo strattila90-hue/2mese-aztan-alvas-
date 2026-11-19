@@ -1,0 +1,32 @@
+[🇬🇧 English](README.md) · 🇭🇺 Magyar
+
+# 2mese és alvás 🌙
+
+Magyar nyelvű esti mese app 3–6 éveseknek: felolvasással, altató zenével és nyugtató esti rutinnal. Sima HTML, nincs build.
+
+![Demó](docs/demo.gif)
+
+![License: MIT](https://img.shields.io/badge/license-MIT-green) ![Last commit](https://img.shields.io/github/last-commit/strattila90-hue/2mese-aztan-alvas-) ![Repo size](https://img.shields.io/github/repo-size/strattila90-hue/2mese-aztan-alvas-) ![PWA](https://img.shields.io/badge/PWA-installable-blueviolet) ![No build step](https://img.shields.io/badge/build-none-lightgrey)
+
+> Az élő web-címet a repó nem tartalmazza (Vercel-telepítés); a saját telepítésed lépései lent, a „Telepítés” részben.
+
+⭐ Ha tetszik, adj neki egy csillagot, sokat segít!
+
+---
+
+Esti mese app 3–6 éveseknek. Sima HTML, nincs build: GitHubra feltöltöd, Vercelben importálod, kész.
+
+## Telepítés
+1. Tedd a fájlokat (`index.html`, `stories.js`) a repo gyökerébe.
+2. Vercel → Add New Project → válaszd a repót → Deploy (Framework: Other).
+
+## Új mese
+A `stories.js` végére másolj be egy blokkot (id, cím, kategória, emoji, két szín, szöveg bekezdésekben).
+Valódi kép: tedd az `img/` mappába, és add meg `"img":"img/id.webp"` – (a kódban a `.img` és `.cover` elemhez adható).
+
+## Megjegyzés
+A felolvasás a telefon beépített magyar hangját használja; Androidon/iOS-en a beállításokban érdemes a jobb minőségű magyar hangot letölteni.
+A népmesék közkincsek; a modern szerzői művek (pl. Bogyó és Babóca) védettek, azokat ne másold be.
+
+## Frissítés
+Az app indításkor és visszatéréskor magától ellenőrzi a `version.json` számát. Új mese vagy módosítás feltöltésekor növeld a `v` értékét (pl. `{"v":"9"}`), és a telefonok maguktól frissülnek (a mese végén, olvasás közben nem szakítja meg). Kézzel: 🔄 gomb a főoldal jobb felső sarkában.
